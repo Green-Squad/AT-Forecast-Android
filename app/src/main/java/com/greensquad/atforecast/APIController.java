@@ -14,6 +14,18 @@ public class APIController implements Callback<Shelter> {
     static final String BASE_URL = "https://www.imjordansmith.com/";
     static final String LOG_TAG = "APIController";
 
+    private static Retrofit retrofit = null;
+
+    public static Retrofit getClient() {
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
+        return retrofit;
+    }
+
     public void start() {
         Gson gson = new GsonBuilder()
                 .setLenient()
