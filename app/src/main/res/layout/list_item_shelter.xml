@@ -2,22 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip" >
-
-    <TextView
-        android:id="@+id/shelters_shelter_name"
-        android:layout_width="wrap_content"
-        android:layout_height="26dip"
-        android:text="Shelter Name"
-        android:textSize="16sp"
-        android:layout_marginRight="10dp" />
+    android:padding="10dp" >
 
     <TextView
         android:id="@+id/shelters_shelter_mileage"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/shelters_shelter_name"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:text="Shelter Mileage"
+        android:layout_marginRight="10dp"
         android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/shelters_shelter_name"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/shelters_shelter_mileage"
+        android:gravity="left|center_vertical"
+        android:text="Shelter Name"
+        android:textSize="16sp" />
 
 </RelativeLayout>

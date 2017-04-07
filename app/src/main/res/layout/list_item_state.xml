@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp" >
+    android:padding="10dp" >
 
     <TextView
         android:id="@+id/state_name"
