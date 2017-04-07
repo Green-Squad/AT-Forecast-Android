@@ -5,14 +5,23 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> {
+    static final String LOG_TAG = StateAdapter.class.getSimpleName();
     private ArrayList<State> mStates;
+    private Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
@@ -44,15 +53,32 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_state, parent, false);
         ViewHolder vh = new ViewHolder(v);
+        context = parent.getContext();
         return vh;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        State state = mStates.get(position);
-        String stateName = state.getName();
+        final State state = mStates.get(position);
+        final String stateName = state.getName();
+
+        RelativeLayout r = (RelativeLayout) holder.name.getParent();
+
         holder.name.setText(stateName);
         holder.temps.setText(state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
+
+        r.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Gson gson = new Gson();
+                String shelterList = gson.toJson(state.getShelters());
+
+                Intent intent = new Intent(context, SheltersActivity.class);
+                intent.putExtra("shelters", shelterList);
+                intent.putExtra("stateName", stateName);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

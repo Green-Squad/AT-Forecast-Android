@@ -1,8 +1,7 @@
 package com.greensquad.atforecast;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,7 +25,6 @@ public class ShelterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shelter);
 
-        final TextView shelterName = (TextView) findViewById(R.id.shelter_name);
         final TextView shelterMile = (TextView) findViewById(R.id.shelter_mileage);
         final TextView shelterElevation = (TextView) findViewById(R.id.shelter_elevation);
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
@@ -38,7 +36,7 @@ public class ShelterActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
         Bundle extras = getIntent().getExtras();
-        int shelterId = extras.getInt("id");
+        final int shelterId = extras.getInt("id");
 
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
 
@@ -47,8 +45,8 @@ public class ShelterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Shelter> call, Response<Shelter> response) {
                 Shelter shelter = response.body();
+                getSupportActionBar().setTitle(shelter.getName());
 
-                shelterName.setText(shelter.getName());
                 shelterMile.setText(shelter.getMileage().toString());
                 shelterElevation.setText(shelter.getElevation().toString());
 
