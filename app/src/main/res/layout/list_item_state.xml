@@ -2,22 +2,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip" >
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp" >
 
     <TextView
         android:id="@+id/state_name"
         android:layout_width="wrap_content"
-        android:layout_height="26dip"
+        android:layout_height="match_parent"
+        android:layout_marginRight="10dp"
+        android:gravity="center"
         android:text="State Name"
-        android:textSize="16sp"
-        android:layout_marginRight="10dp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/state_avg_temps"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
         android:layout_toRightOf="@id/state_name"
-        android:text="0 / 0"
+        android:gravity="right|center_vertical"
+        android:text="State Average Temps"
         android:textSize="12sp" />
 
 </RelativeLayout>

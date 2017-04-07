@@ -65,7 +65,7 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         RelativeLayout r = (RelativeLayout) holder.name.getParent();
 
         holder.name.setText(stateName);
-        holder.temps.setText(state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
+        holder.temps.setText("State average: " + state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
 
         r.setOnClickListener(new View.OnClickListener() {
             @Override
