@@ -1,26 +1,17 @@
 package com.greensquad.atforecast;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SheltersActivity extends AppCompatActivity {
 
@@ -57,4 +48,5 @@ public class SheltersActivity extends AppCompatActivity {
         mAdapter = new SheltersAdapter(sheltersArrayList);
         recyclerView.setAdapter(mAdapter);
     }
+
 }

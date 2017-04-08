@@ -1,22 +1,17 @@
 package com.greensquad.atforecast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> {
     static final String LOG_TAG = StateAdapter.class.getSimpleName();
