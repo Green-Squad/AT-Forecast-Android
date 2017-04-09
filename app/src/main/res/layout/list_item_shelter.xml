@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:paddingLeft="24dp"
     android:paddingRight="24dp">
@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/shelters_shelter_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/shelters_shelter_mileage"
         android:gravity="left|center_vertical"

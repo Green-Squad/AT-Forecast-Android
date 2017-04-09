@@ -61,12 +61,10 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         final State state = mStates.get(position);
         final String stateName = state.getName();
 
-        RelativeLayout r = (RelativeLayout) holder.name.getParent();
-
         holder.name.setText(stateName);
         holder.temps.setText("State average: " + state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
 
-        r.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Gson gson = new Gson();
