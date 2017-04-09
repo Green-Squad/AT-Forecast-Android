@@ -1,4 +1,4 @@
-package com.greensquad.atforecast;
+package com.greensquad.atforecast.models;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

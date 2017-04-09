@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShelterActivity"
+    tools:context="com.greensquad.atforecast.fragments.ShelterDetailFragment"
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
@@ -15,17 +15,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/shelter_mileage" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/shelter_mileage" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/shelter_elevation"
-            />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/shelter_elevation" />
+
         </LinearLayout>
+
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.RecyclerView

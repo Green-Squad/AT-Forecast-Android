@@ -1,5 +1,8 @@
 package com.greensquad.atforecast;
 
+import com.greensquad.atforecast.models.Shelter;
+import com.greensquad.atforecast.models.State;
+
 import java.util.List;
 
 import retrofit2.Call;

@@ -1,7 +1,8 @@
-package com.greensquad.atforecast;
+package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
-import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
+import com.greensquad.atforecast.R;
+import com.greensquad.atforecast.fragments.ShelterDetailFragment;
+import com.greensquad.atforecast.models.Shelter;
 
 import java.util.ArrayList;
 
@@ -66,9 +69,14 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
         r.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Intent intent = new Intent(context, ShelterActivity.class);
-            intent.putExtra("id", shelter.getId());
-            context.startActivity(intent);
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getId());
+                FragmentManager manager = activity.getSupportFragmentManager();
+                manager.beginTransaction().replace(
+                        R.id.fragment_main,
+                        shelterDetailFragment,
+                        shelterDetailFragment.getTag()
+                ).addToBackStack("shelter_detail_fragment").commit();
             }
         });
     }

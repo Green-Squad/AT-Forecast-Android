@@ -2,6 +2,9 @@ package com.greensquad.atforecast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.greensquad.atforecast.models.DailyWeather;
+import com.greensquad.atforecast.models.Shelter;
+
 import android.util.Log;
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,7 +1,8 @@
-package com.greensquad.atforecast;
+package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
-import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.greensquad.atforecast.R;
+import com.greensquad.atforecast.fragments.ShelterListFragment;
+import com.greensquad.atforecast.models.State;
 
 import java.util.ArrayList;
 
@@ -68,10 +72,14 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
                 Gson gson = new Gson();
                 String shelterList = gson.toJson(state.getShelters());
 
-                Intent intent = new Intent(context, SheltersActivity.class);
-                intent.putExtra("shelters", shelterList);
-                intent.putExtra("stateName", stateName);
-                context.startActivity(intent);
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                ShelterListFragment shelterListFragment = ShelterListFragment.newInstance(stateName, shelterList);
+                FragmentManager manager = activity.getSupportFragmentManager();
+                manager.beginTransaction().replace(
+                        R.id.fragment_main,
+                        shelterListFragment,
+                        shelterListFragment.getTag()
+                ).addToBackStack("shelter_list_fragment").commit();
             }
         });
     }

@@ -1,4 +1,4 @@
-package com.greensquad.atforecast;
+package com.greensquad.atforecast.adapters;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.greensquad.atforecast.R;
+import com.greensquad.atforecast.models.DailyWeather;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> {
     private ArrayList<DailyWeather> mDailyWeathers;

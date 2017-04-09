@@ -1,10 +1,14 @@
-package com.greensquad.atforecast;
+package com.greensquad.atforecast.models;
 
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class State {
+import java.util.List;
+
+public class State implements Parcelable {
 
     @SerializedName("name")
     @Expose
@@ -18,6 +22,36 @@ public class State {
     @SerializedName("shelters")
     @Expose
     private List<Shelter> shelters = null;
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    protected State(Parcel in) {
+        name = in.readString();
+        averageHigh = in.readInt();
+        averageLow = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeInt(averageHigh);
+        dest.writeInt(averageLow);
+    }
+
+    public static final Creator<State> CREATOR = new Creator<State>() {
+        @Override
+        public State createFromParcel(Parcel in) {
+            return new State(in);
+        }
+
+        @Override
+        public State[] newArray(int size) {
+            return new State[size];
+        }
+    };
 
     public String getName() {
         return name;
