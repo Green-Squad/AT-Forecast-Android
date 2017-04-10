@@ -11,36 +11,38 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.adapters.StateAdapter;
+import com.greensquad.atforecast.base.BackButtonSupportFragment;
+import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.State;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.OnItemClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StateListFragment extends Fragment {
+public class StateListFragment extends BaseFragment implements BackButtonSupportFragment{
     private static final String ARG_STATE_LIST = "states";
     private static final String LOG_TAG = StateListFragment.class.getSimpleName();
+
+    private String[] titlesArray;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
 
     public StateListFragment() {}
 
-    public static StateListFragment newInstance(ArrayList<State> shelters) {
-        StateListFragment fragment = new StateListFragment();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_STATE_LIST, shelters);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public static StateListFragment newInstance() { return new StateListFragment(); }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +85,16 @@ public class StateListFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    protected String getTitle() {
+        return "AT Forecast";
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
 }

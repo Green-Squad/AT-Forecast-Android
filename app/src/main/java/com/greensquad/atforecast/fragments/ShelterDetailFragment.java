@@ -15,6 +15,8 @@ import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.adapters.DailyWeatherAdapter;
 import com.greensquad.atforecast.R;
+import com.greensquad.atforecast.base.BackButtonSupportFragment;
+import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.Shelter;
 
@@ -24,13 +26,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ShelterDetailFragment extends Fragment {
+public class ShelterDetailFragment extends BaseFragment implements BackButtonSupportFragment {
     private static final String LOG_TAG = ShelterDetailFragment.class.getSimpleName();
     private static final String ARG_SHELTER_ID = "shelter_id";
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     private Integer mShelterId;
     private String mShelterName;
@@ -64,7 +65,7 @@ public class ShelterDetailFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
         recyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
@@ -74,9 +75,8 @@ public class ShelterDetailFragment extends Fragment {
             @Override
             public void onResponse(Call<Shelter> call, Response<Shelter> response) {
                 Shelter shelter = response.body();
-
                 mShelterName = shelter.getName();
-                getActivity().setTitle(mShelterName);
+                getActivity().setTitle(getTitle());
 
                 shelterMile.setText(shelter.getMileage().toString());
                 shelterElevation.setText(shelter.getElevation().toString());
@@ -94,6 +94,16 @@ public class ShelterDetailFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    protected String getTitle() {
+        return mShelterName;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
 }
