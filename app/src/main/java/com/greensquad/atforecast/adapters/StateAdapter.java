@@ -73,7 +73,12 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ShelterListFragment shelterListFragment = ShelterListFragment.newInstance(stateName, shelterList);
                 FragmentManager manager = activity.getSupportFragmentManager();
-                manager.beginTransaction().replace(
+                manager.beginTransaction().setCustomAnimations(
+                        R.anim.fragment_slide_left_enter,
+                        R.anim.fragment_slide_left_exit,
+                        R.anim.fragment_slide_right_enter,
+                        R.anim.fragment_slide_right_exit)
+                    .replace(
                         R.id.fragment_main,
                         shelterListFragment,
                         shelterListFragment.getTag()

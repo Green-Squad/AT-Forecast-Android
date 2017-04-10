@@ -67,7 +67,12 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getId());
                 FragmentManager manager = activity.getSupportFragmentManager();
-                manager.beginTransaction().replace(
+                manager.beginTransaction().setCustomAnimations(
+                        R.anim.fragment_slide_left_enter,
+                        R.anim.fragment_slide_left_exit,
+                        R.anim.fragment_slide_right_enter,
+                        R.anim.fragment_slide_right_exit)
+                    .replace(
                         R.id.fragment_main,
                         shelterDetailFragment,
                         shelterDetailFragment.getTag()

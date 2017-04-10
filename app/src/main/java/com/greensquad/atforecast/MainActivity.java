@@ -11,8 +11,6 @@ import android.widget.ArrayAdapter;
 import com.greensquad.atforecast.base.BaseActivity;
 import com.greensquad.atforecast.fragments.StateListFragment;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 
 public class MainActivity extends BaseActivity {
