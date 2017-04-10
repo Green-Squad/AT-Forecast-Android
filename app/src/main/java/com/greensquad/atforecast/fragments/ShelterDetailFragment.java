@@ -58,6 +58,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
+
         final TextView shelterMile = (TextView) view.findViewById(R.id.shelter_mileage);
         final TextView shelterElevation = (TextView) view.findViewById(R.id.shelter_elevation);
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();

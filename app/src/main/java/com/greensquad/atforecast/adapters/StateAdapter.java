@@ -20,7 +20,6 @@ import java.util.ArrayList;
 public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> {
     static final String LOG_TAG = StateAdapter.class.getSimpleName();
     private ArrayList<State> mStates;
-    private Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
@@ -52,7 +51,6 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_state, parent, false);
         ViewHolder vh = new ViewHolder(v);
-        context = parent.getContext();
         return vh;
     }
 
