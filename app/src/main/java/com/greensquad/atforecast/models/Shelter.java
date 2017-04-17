@@ -12,7 +12,7 @@ public class Shelter {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer shelterId;
 
     @SerializedName("mileage")
     @Expose
@@ -33,11 +33,11 @@ public class Shelter {
         this.name = name;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getShelterId() {
+        return shelterId;
     }
-    public void setId(Integer id) {
-        this.id = id;
+    public void setShelterId(Integer shelterId) {
+        this.shelterId = shelterId;
     }
 
     public Double getMileage() { return mileage; }

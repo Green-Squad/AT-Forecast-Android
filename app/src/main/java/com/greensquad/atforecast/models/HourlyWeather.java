@@ -7,7 +7,7 @@ public class HourlyWeather {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer hourlyWeatherId;
     @SerializedName("date")
     @Expose
     private String date;
@@ -21,12 +21,12 @@ public class HourlyWeather {
     @Expose
     private String wind;
 
-    public Integer getId() {
-        return id;
+    public Integer getHourlyWeatherId() {
+        return hourlyWeatherId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setHourlyWeatherId(Integer hourlyWeatherId) {
+        this.hourlyWeatherId = hourlyWeatherId;
     }
 
     public String getDate() {

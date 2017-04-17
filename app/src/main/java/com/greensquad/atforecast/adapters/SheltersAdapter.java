@@ -65,7 +65,7 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getId());
+                ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getShelterId());
                 FragmentManager manager = activity.getSupportFragmentManager();
                 manager.beginTransaction().setCustomAnimations(
                         R.anim.fragment_slide_left_enter,
