@@ -1,9 +1,11 @@
 package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Typeface;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import static android.support.v4.content.ContextCompat.getColor;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> {
     private ArrayList<DailyWeather> mDailyWeathers;
@@ -124,32 +128,35 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         // remove views to prevent hourly weather duplication
         holder.hourlyWeatherTable.removeAllViews();
 
+        // Header
+        TableRow header = new TableRow(context);
+
+        TextView hourHeader = new TextView(context);
+        setRowHeader(hourHeader, "Time");
+
+        hourHeader.setPadding(context.getResources().getDimensionPixelSize(R.dimen.row_padding), 0, 0, 0);
+        header.addView(hourHeader);
+
+        TextView tempHeader = new TextView(context);
+        setRowHeader(tempHeader, "Temp");
+        header.addView(tempHeader);
+
+        TextView conditionHeader = new TextView(context);
+        setRowHeader(conditionHeader, "Conditions");
+        header.addView(conditionHeader);
+
+        TextView windHeader = new TextView(context);
+        setRowHeader(windHeader, "Wind");
+        windHeader.setPadding(0, 0, context.getResources().getDimensionPixelSize(R.dimen.row_padding), 0);
+        header.addView(windHeader);
+
+        holder.hourlyWeatherTable.addView(header);
+
         if (hourlyWeatherArrayList.size() == 0) {
-            TableRow row = new TableRow(context);
-            row.setLayoutParams(new TableRow.LayoutParams(
-                    TableRow.LayoutParams.MATCH_PARENT,
-                    context.getResources().getDimensionPixelSize(R.dimen.table_row_height)));
+            TableRow border = getBorder();
+            TableRow row = generateRow("N/A", "N/A", "No hourly weather available.", "N/A");
 
-            TextView hour = new TextView(context);
-            hour.setText("N/A");
-            hour.setPadding(5, 5, 5, 5);
-            row.addView(hour);
-
-            TextView temp = new TextView(context);
-            temp.setText("N/A");
-            temp.setPadding(5, 5, 5, 5);
-            row.addView(temp);
-
-            TextView condition = new TextView(context);
-            condition.setText("No hourly weather available.");
-            condition.setPadding(5, 5, 5, 5);
-            row.addView(condition);
-
-            TextView wind = new TextView(context);
-            wind.setText("N/A");
-            wind.setPadding(5, 5, 5, 5);
-            row.addView(wind);
-
+            holder.hourlyWeatherTable.addView(border);
             holder.hourlyWeatherTable.addView(row);
         }
 
@@ -168,34 +175,57 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
                 pe.printStackTrace();
             }
 
-            TableRow row = new TableRow(context);
-            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
-                    TableRow.LayoutParams.MATCH_PARENT,
-                    context.getResources().getDimensionPixelSize(R.dimen.table_row_height));
-            row.setLayoutParams(rowParams);
+            TableRow row = generateRow(formattedHourlyDate, hw.getTemp() + "°", hw.getDescription(), hw.getWind());
+            TableRow border = getBorder();
 
-            TextView hour = new TextView(context);
-            hour.setText(formattedHourlyDate);
-            hour.setPadding(5, 5, 5, 5);
-            row.addView(hour);
-
-            TextView temp = new TextView(context);
-            temp.setText(hw.getTemp() + "°");
-            temp.setPadding(5, 5, 5, 5);
-            row.addView(temp);
-
-            TextView condition = new TextView(context);
-            condition.setText(hw.getDescription());
-            condition.setPadding(5, 5, 5, 5);
-            row.addView(condition);
-
-            TextView wind = new TextView(context);
-            wind.setText(hw.getWind());
-            wind.setPadding(5, 5, 5, 5);
-            row.addView(wind);
-
+            holder.hourlyWeatherTable.addView(border);
             holder.hourlyWeatherTable.addView(row);
+
         }
+    }
+
+    private TableRow generateRow(String hourStr, String tempStr, String conditionStr, String windStr) {
+        TableRow row = new TableRow(context);
+
+        TextView hour = new TextView(context);
+        hour.setText(hourStr);
+        hour.setPadding(context.getResources().getDimensionPixelSize(R.dimen.row_padding), 0, 0, 0);
+        row.addView(hour);
+
+        TextView temp = new TextView(context);
+        temp.setText(tempStr);
+        row.addView(temp);
+
+        TextView condition = new TextView(context);
+        condition.setText(conditionStr);
+        condition.setHeight(context.getResources().getDimensionPixelSize(R.dimen.table_row_height));
+        condition.setGravity(Gravity.CENTER_VERTICAL);
+        row.addView(condition);
+
+        TextView wind = new TextView(context);
+        wind.setText(windStr);
+        wind.setPadding(0, 0, context.getResources().getDimensionPixelSize(R.dimen.row_padding), 0);
+        row.addView(wind);
+
+        return row;
+    }
+
+    private void setRowHeader(TextView view, String text) {
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        view.setTypeface(null, Typeface.BOLD);
+        view.setTextColor(getColor(context, R.color.tableHeaderText));
+        view.setHeight(context.getResources().getDimensionPixelSize(R.dimen.table_row_height));
+        view.setGravity(Gravity.CENTER_VERTICAL);
+        view.setText(text);
+    }
+
+    private TableRow getBorder() {
+        TableRow border = new TableRow(context);
+        border.setBackgroundColor(getColor(context, R.color.rowBorder));
+        TextView borderView = new TextView(context);
+        borderView.setHeight(context.getResources().getDimensionPixelSize(R.dimen.row_padding_height));
+        border.addView(borderView);
+        return border;
     }
 
     @Override
