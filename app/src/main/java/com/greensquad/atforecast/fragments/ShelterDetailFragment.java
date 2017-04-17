@@ -59,8 +59,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
-        final TextView shelterMile = (TextView) view.findViewById(R.id.shelter_mileage);
-        final TextView shelterElevation = (TextView) view.findViewById(R.id.shelter_elevation);
+        //final TextView shelterMile = (TextView) view.findViewById(R.id.shelter_mileage);
+        //final TextView shelterElevation = (TextView) view.findViewById(R.id.shelter_elevation);
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
@@ -79,8 +79,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 mShelterName = shelter.getName();
                 getActivity().setTitle(getTitle());
 
-                shelterMile.setText(shelter.getMileage().toString());
-                shelterElevation.setText(shelter.getElevation().toString());
+                //shelterMile.setText(shelter.getMileage().toString());
+                //shelterElevation.setText(shelter.getElevation().toString());
 
                 for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
                     dailyWeathers.add(dailyWeather);

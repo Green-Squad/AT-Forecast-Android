@@ -10,52 +10,77 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dip"
+        android:layout_marginTop="8dip"
         android:layout_marginBottom="2dip"
         card_view:cardUseCompatPadding="true" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp" >
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/date"
+            <ImageView
+                android:id="@+id/weather_img"
                 android:layout_width="match_parent"
-                android:layout_height="26dip"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/condition"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/date"
-                android:layout_marginEnd="12dp"
-                android:textSize="12sp" />
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter" />
 
-            <TextView
-                android:id="@+id/temps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/date"
-                android:layout_toEndOf="@id/condition"
-                android:textSize="12sp" />
-
-            <TableLayout
-                android:id="@+id/hourly_weather_table_layout"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:stretchColumns="*"
-                android:layout_marginTop="5dp"
-                android:layout_below="@id/temps">
+                android:layout_height="wrap_content"
+                android:background="#59000000"
+                android:padding="16dp"
+                android:layout_alignBottom="@id/weather_img">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/hourly_weather_recycler_view"
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="match_parent"
+                    android:layout_height="26dip"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/temps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:layout_below="@id/date"
+                    android:layout_marginEnd="12dp"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:layout_below="@id/date"
+                    android:layout_toEndOf="@id/temps"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weather_img"
+                android:padding="16dp">
+
+                <TableLayout
+                    android:id="@+id/hourly_weather_table_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scrollbars="vertical" />
+                    android:stretchColumns="*"
+                    android:layout_marginTop="5dp">
 
-            </TableLayout>
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/hourly_weather_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="vertical" />
+
+                </TableLayout>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
