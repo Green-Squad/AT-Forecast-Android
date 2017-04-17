@@ -3,7 +3,6 @@ package com.greensquad.atforecast.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
@@ -21,12 +18,11 @@ import com.greensquad.atforecast.adapters.StateAdapter;
 import com.greensquad.atforecast.base.BackButtonSupportFragment;
 import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.State;
+import com.orm.SugarRecord;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.OnItemClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,6 +70,19 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
                 for (State state : statesList) {
                     states.add(state);
+
+                        long l = SugarRecord.save(state);
+
+                        Log.d(LOG_TAG, "long: " + l);
+
+
+
+
+                }
+                List<State> dbStates = SugarRecord.listAll(State.class);
+                Log.d(LOG_TAG, dbStates.size() + "");
+                for (State state2 : dbStates) {
+                    Log.d(LOG_TAG, state2.getName());
                 }
                 mAdapter = new StateAdapter(states);
                 recyclerView.setAdapter(mAdapter);

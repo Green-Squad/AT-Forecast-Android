@@ -3,9 +3,13 @@ package com.greensquad.atforecast.models;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
+import com.orm.dsl.Table;
 
-public class Shelter {
-
+public class Shelter extends SugarRecord {
+    @SerializedName("pkey")
+    private long id;
     @SerializedName("name")
     @Expose
     private String name;
@@ -24,7 +28,10 @@ public class Shelter {
 
     @SerializedName("daily_weather")
     @Expose
+    @Ignore
     private List<DailyWeather> dailyWeather = null;
+
+    public Shelter() {}
 
     public String getName() {
         return name;

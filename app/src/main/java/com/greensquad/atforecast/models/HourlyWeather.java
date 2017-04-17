@@ -2,9 +2,11 @@ package com.greensquad.atforecast.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.orm.SugarRecord;
 
-public class HourlyWeather {
-
+public class HourlyWeather extends SugarRecord {
+    @SerializedName("pkey")
+    private long id;
     @SerializedName("id")
     @Expose
     private Integer hourlyWeatherId;
@@ -20,6 +22,8 @@ public class HourlyWeather {
     @SerializedName("wind")
     @Expose
     private String wind;
+
+    public HourlyWeather() {}
 
     public Integer getHourlyWeatherId() {
         return hourlyWeatherId;

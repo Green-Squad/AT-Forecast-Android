@@ -21,29 +21,13 @@ public class APIController implements Callback<Shelter> {
 
     public static Retrofit getClient() {
         if (retrofit == null) {
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         return retrofit;
-    }
-
-    public void start() {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        ATForecastAPI atforecastAPI = retrofit.create(ATForecastAPI.class);
-
-        Call<Shelter> call = atforecastAPI.getShelter(3);
-        call.enqueue(this);
-
     }
 
     @Override

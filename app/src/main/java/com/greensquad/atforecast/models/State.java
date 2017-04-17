@@ -5,11 +5,14 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
 import java.util.List;
 
-public class State implements Parcelable {
-
+public class State extends SugarRecord implements Parcelable {
+    @SerializedName("pkey")
+    private long id;
     @SerializedName("name")
     @Expose
     private String name;
@@ -21,12 +24,15 @@ public class State implements Parcelable {
     private Integer averageLow;
     @SerializedName("shelters")
     @Expose
+    @Ignore
     private List<Shelter> shelters = null;
 
     @Override
     public int describeContents() {
         return 0;
     }
+
+    public State() {}
 
     protected State(Parcel in) {
         name = in.readString();

@@ -1,11 +1,15 @@
 package com.greensquad.atforecast.models;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
-public class DailyWeather {
+import java.util.List;
 
+public class DailyWeather extends SugarRecord {
+    @SerializedName("pkey")
+    private long id;
     @SerializedName("id")
     @Expose
     private Integer dailyWeatherId;
@@ -29,7 +33,10 @@ public class DailyWeather {
     private Integer shelterId;
     @SerializedName("hourly_weather")
     @Expose
+    @Ignore
     private List<HourlyWeather> hourlyWeather = null;
+
+    public DailyWeather() {}
 
     public Integer getDailyWeatherId() {
         return dailyWeatherId;
