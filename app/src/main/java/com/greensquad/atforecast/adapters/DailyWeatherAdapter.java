@@ -120,13 +120,15 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         holder.hourlyWeathers.setHasFixedSize(true);
 
         ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(dw.getHourlyWeather());
+
         // remove views to prevent hourly weather duplication
         holder.hourlyWeatherTable.removeAllViews();
+
         if (hourlyWeatherArrayList.size() == 0) {
             TableRow row = new TableRow(context);
             row.setLayoutParams(new TableRow.LayoutParams(
                     TableRow.LayoutParams.MATCH_PARENT,
-                    TableRow.LayoutParams.WRAP_CONTENT));
+                    context.getResources().getDimensionPixelSize(R.dimen.table_row_height)));
 
             TextView hour = new TextView(context);
             hour.setText("N/A");
@@ -150,12 +152,14 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
             holder.hourlyWeatherTable.addView(row);
         }
+
         for (int i = 0; i < hourlyWeatherArrayList.size(); i++) {
             HourlyWeather hw = hourlyWeatherArrayList.get(i);
 
             String hourString = hw.getDate();
             Date parsedHourlyDate;
             String formattedHourlyDate;
+
             try {
                 parsedHourlyDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US).parse(hourString);
                 formattedHourlyDate = new SimpleDateFormat("h:mm a").format(parsedHourlyDate);
@@ -165,9 +169,10 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             }
 
             TableRow row = new TableRow(context);
-            row.setLayoutParams(new TableRow.LayoutParams(
+            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
                     TableRow.LayoutParams.MATCH_PARENT,
-                    TableRow.LayoutParams.WRAP_CONTENT));
+                    context.getResources().getDimensionPixelSize(R.dimen.table_row_height));
+            row.setLayoutParams(rowParams);
 
             TextView hour = new TextView(context);
             hour.setText(formattedHourlyDate);
