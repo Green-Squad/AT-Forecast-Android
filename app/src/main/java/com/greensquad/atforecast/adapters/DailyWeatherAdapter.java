@@ -64,6 +64,18 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     public DailyWeatherAdapter(ArrayList<DailyWeather> myDailyWeathers) {
         mDailyWeathers = myDailyWeathers;
+        for (DailyWeather dw : myDailyWeathers) {
+            List<HourlyWeather> hourlyWeatherList = dw.getHourlyWeather();
+            if (hourlyWeatherList == null) {
+                hourlyWeatherList = dw.getHourlyWeatherFromDb();
+            } else {
+                for (HourlyWeather hw : hourlyWeatherList) {
+                    hw.setDailyWeatherId(dw.getDailyWeatherId());
+                    hw.save();
+                }
+            }
+        }
+
     }
 
     @Override
@@ -124,16 +136,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         holder.temps.setText(dw.getHigh() + "° / " + dw.getLow() + "°");
         holder.hourlyWeathers.setHasFixedSize(true);
 
-        List<HourlyWeather> hourlyWeatherList = dw.getHourlyWeather();
-        if (hourlyWeatherList == null) {
-            hourlyWeatherList = dw.getHourlyWeatherFromDb();
-        } else {
-            for (HourlyWeather hw : hourlyWeatherList) {
-                hw.setDailyWeatherId(dw.getDailyWeatherId());
-                hw.save();
-            }
-        }
-        ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(hourlyWeatherList);
+        ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(dw.getHourlyWeatherFromDb());
 
         // remove views to prevent hourly weather duplication
         holder.hourlyWeatherTable.removeAllViews();
