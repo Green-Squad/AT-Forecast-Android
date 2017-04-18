@@ -1,22 +1,23 @@
 package com.greensquad.atforecast.models;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-import com.orm.dsl.Table;
+import com.orm.dsl.Unique;
+
+import java.util.List;
 
 public class Shelter extends SugarRecord {
-    @SerializedName("pkey")
-    private long id;
+
+    @SerializedName("shelter_id")
+    @Expose
+    @Unique
+    private Integer shelterId;
+
     @SerializedName("name")
     @Expose
     private String name;
-
-    @SerializedName("id")
-    @Expose
-    private Integer shelterId;
 
     @SerializedName("mileage")
     @Expose

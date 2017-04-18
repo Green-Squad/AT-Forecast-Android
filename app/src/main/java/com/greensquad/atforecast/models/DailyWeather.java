@@ -8,29 +8,35 @@ import com.orm.dsl.Ignore;
 import java.util.List;
 
 public class DailyWeather extends SugarRecord {
-    @SerializedName("pkey")
-    private long id;
-    @SerializedName("id")
+
+    @SerializedName("daily_weather_id")
     @Expose
     private Integer dailyWeatherId;
+
     @SerializedName("weather_date")
     @Expose
     private String weatherDate;
+
     @SerializedName("high")
     @Expose
     private Integer high;
+
     @SerializedName("low")
     @Expose
     private Integer low;
+
     @SerializedName("description")
     @Expose
     private String description;
+
     @SerializedName("wind")
     @Expose
     private String wind;
+
     @SerializedName("shelter_id")
     @Expose
     private Integer shelterId;
+
     @SerializedName("hourly_weather")
     @Expose
     @Ignore

@@ -21,10 +21,9 @@ public class APIController implements Callback<Shelter> {
 
     public static Retrofit getClient() {
         if (retrofit == null) {
-            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;

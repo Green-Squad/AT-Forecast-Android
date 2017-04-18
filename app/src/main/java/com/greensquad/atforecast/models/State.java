@@ -7,21 +7,25 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.Unique;
 
 import java.util.List;
 
 public class State extends SugarRecord implements Parcelable {
-    @SerializedName("pkey")
-    private long id;
+
     @SerializedName("name")
     @Expose
+    @Unique
     private String name;
+
     @SerializedName("average_high")
     @Expose
     private Integer averageHigh;
+
     @SerializedName("average_low")
     @Expose
     private Integer averageLow;
+
     @SerializedName("shelters")
     @Expose
     @Ignore

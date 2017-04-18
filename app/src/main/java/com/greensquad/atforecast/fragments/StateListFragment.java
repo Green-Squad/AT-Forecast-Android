@@ -70,20 +70,15 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
                 for (State state : statesList) {
                     states.add(state);
-
-                        long l = SugarRecord.save(state);
-
-                        Log.d(LOG_TAG, "long: " + l);
-
-
-
-
+                    state.save();
                 }
-                List<State> dbStates = SugarRecord.listAll(State.class);
-                Log.d(LOG_TAG, dbStates.size() + "");
+
+                List<State> dbStates = State.listAll(State.class);
                 for (State state2 : dbStates) {
-                    Log.d(LOG_TAG, state2.getName());
+                    Log.d(LOG_TAG, state2.getName() + " / " + state2.getId());
                 }
+                Log.d(LOG_TAG, "--------------------");
+
                 mAdapter = new StateAdapter(states);
                 recyclerView.setAdapter(mAdapter);
             }

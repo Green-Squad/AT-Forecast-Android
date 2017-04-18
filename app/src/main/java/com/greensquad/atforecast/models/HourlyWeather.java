@@ -5,20 +5,23 @@ import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 
 public class HourlyWeather extends SugarRecord {
-    @SerializedName("pkey")
-    private long id;
-    @SerializedName("id")
+
+    @SerializedName("hourly_weather_id")
     @Expose
     private Integer hourlyWeatherId;
+
     @SerializedName("date")
     @Expose
     private String date;
+
     @SerializedName("temp")
     @Expose
     private Integer temp;
+
     @SerializedName("description")
     @Expose
     private String description;
+
     @SerializedName("wind")
     @Expose
     private String wind;
