@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import static android.support.v4.content.ContextCompat.getColor;
@@ -123,7 +124,16 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         holder.temps.setText(dw.getHigh() + "° / " + dw.getLow() + "°");
         holder.hourlyWeathers.setHasFixedSize(true);
 
-        ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(dw.getHourlyWeather());
+        List<HourlyWeather> hourlyWeatherList = dw.getHourlyWeather();
+        if (hourlyWeatherList == null) {
+            hourlyWeatherList = dw.getHourlyWeatherFromDb();
+        } else {
+            for (HourlyWeather hw : hourlyWeatherList) {
+                hw.setDailyWeatherId(dw.getDailyWeatherId());
+                hw.save();
+            }
+        }
+        ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(hourlyWeatherList);
 
         // remove views to prevent hourly weather duplication
         holder.hourlyWeatherTable.removeAllViews();

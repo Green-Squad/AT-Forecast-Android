@@ -9,13 +9,18 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Unique;
 
+import java.util.Date;
 import java.util.List;
 
 public class State extends SugarRecord implements Parcelable {
 
-    @SerializedName("name")
+    @SerializedName("state_id")
     @Expose
     @Unique
+    private Integer stateId;
+
+    @SerializedName("name")
+    @Expose
     private String name;
 
     @SerializedName("average_high")
@@ -30,6 +35,7 @@ public class State extends SugarRecord implements Parcelable {
     @Expose
     @Ignore
     private List<Shelter> shelters = null;
+    private Date updatedAt;
 
     @Override
     public int describeContents() {
@@ -63,6 +69,14 @@ public class State extends SugarRecord implements Parcelable {
         }
     };
 
+    public Integer getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Integer stateId) {
+        this.stateId = stateId;
+    }
+
     public String getName() {
         return name;
     }
@@ -91,8 +105,27 @@ public class State extends SugarRecord implements Parcelable {
         return shelters;
     }
 
+    public List<Shelter> getSheltersFromDb() {
+        return Shelter.find(Shelter.class, "state_id = ?", getStateId() + "");
+    }
+
     public void setShelters(List<Shelter> shelters) {
         this.shelters = shelters;
     }
+
+    @Override
+    public long save() {
+        setUpdatedAt(new Date());
+        return super.save();
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Date getUpdatedAt() {
+        return  updatedAt;
+    }
+
 
 }

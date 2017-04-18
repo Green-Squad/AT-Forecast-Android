@@ -8,11 +8,12 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ATForecastAPI {
 
     @GET("/index.json")
-    Call<List<State>> getStates();
+    Call<List<State>> getStates(@Query("include_shelters") boolean includeShelters);
 
     @GET("/shelters/{id}.json")
     Call<Shelter> getShelter(@Path("id") Integer id);

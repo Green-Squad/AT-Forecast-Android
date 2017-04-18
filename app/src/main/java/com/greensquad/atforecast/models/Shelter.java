@@ -32,6 +32,8 @@ public class Shelter extends SugarRecord {
     @Ignore
     private List<DailyWeather> dailyWeather = null;
 
+    private int stateId;
+
     public Shelter() {}
 
     public String getName() {
@@ -59,6 +61,18 @@ public class Shelter extends SugarRecord {
     }
     public void setDailyWeather(List<DailyWeather> dailyWeather) {
         this.dailyWeather = dailyWeather;
+    }
+
+    public List<DailyWeather> getDailyWeatherFromDb() {
+        return DailyWeather.find(DailyWeather.class, "daily_weather_id = ?", getShelterId() + "");
+    }
+
+    public int getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(int stateId) {
+        this.stateId = stateId;
     }
 
 }

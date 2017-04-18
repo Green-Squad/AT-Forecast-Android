@@ -17,10 +17,12 @@ import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.adapters.StateAdapter;
 import com.greensquad.atforecast.base.BackButtonSupportFragment;
 import com.greensquad.atforecast.base.BaseFragment;
+import com.greensquad.atforecast.models.Shelter;
 import com.greensquad.atforecast.models.State;
-import com.orm.SugarRecord;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -60,34 +62,79 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+        List<State> dbStates = State.listAll(State.class);
 
-        Call<List<State>> call = apiService.getStates();
-        call.enqueue(new Callback<List<State>>() {
-            @Override
-            public void onResponse(Call<List<State>> call, Response<List<State>> response) {
-                List<State> statesList = response.body();
+        mAdapter = new StateAdapter(new ArrayList<State>(dbStates));
+        recyclerView.setAdapter(mAdapter);
+        // first run
+        if (dbStates.isEmpty()) {
+            Log.d(LOG_TAG, "First Run");
+            ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+            Call<List<State>> call = apiService.getStates(true);
+            call.enqueue(new Callback<List<State>>() {
+                @Override
+                public void onResponse(Call<List<State>> call, Response<List<State>> response) {
+                    List<State> statesList = response.body();
+                    for (State state : statesList) {
+                        states.add(state);
+                        state.save();
+                        List<Shelter> shelters = state.getShelters();
+                        for (Shelter shelter : shelters) {
+                            shelter.setStateId(state.getStateId());
+                            shelter.save();
+                        }
+                    }
 
-                for (State state : statesList) {
-                    states.add(state);
-                    state.save();
+                    List<Shelter> dbShelters = Shelter.listAll(Shelter.class);
+
+                    Log.d(LOG_TAG, dbShelters.size() + "");
+
+
+                    ((StateAdapter)recyclerView.getAdapter()).refill(states);
                 }
 
-                List<State> dbStates = State.listAll(State.class);
-                for (State state2 : dbStates) {
-                    Log.d(LOG_TAG, state2.getName() + " / " + state2.getId());
+                @Override
+                public void onFailure(Call<List<State>>call, Throwable t) {
+                    Log.e(LOG_TAG, t.toString());
                 }
-                Log.d(LOG_TAG, "--------------------");
+            });
+        } else {
+            Log.d(LOG_TAG, "Potential Update Run");
+            Date updatedAtDate = dbStates.get(0).getUpdatedAt();
+            int minutesUntilRefresh = 12 * 60;
+            int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(updatedAtDate);
+            long updatedAtDateInMillis = calendar.getTimeInMillis();
+            Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
 
-                mAdapter = new StateAdapter(states);
-                recyclerView.setAdapter(mAdapter);
-            }
+            Date currentDate = new Date(System.currentTimeMillis());
 
-            @Override
-            public void onFailure(Call<List<State>>call, Throwable t) {
-                Log.e(LOG_TAG, t.toString());
+            if(currentDate.after(timeToUpdate)) {
+                Log.d(LOG_TAG, "Update Run");
+                ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+                Call<List<State>> call = apiService.getStates(false);
+                call.enqueue(new Callback<List<State>>() {
+                    @Override
+                    public void onResponse(Call<List<State>> call, Response<List<State>> response) {
+                        List<State> statesList = response.body();
+                        for (State state : statesList) {
+                            states.add(state);
+                            state.save();
+                        }
+
+                        ((StateAdapter)recyclerView.getAdapter()).refill(states);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<State>>call, Throwable t) {
+                        Log.e(LOG_TAG, t.toString());
+                    }
+                });
             }
-        });
+        }
+
+
         return view;
     }
 

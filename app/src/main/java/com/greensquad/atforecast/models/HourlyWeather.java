@@ -26,6 +26,9 @@ public class HourlyWeather extends SugarRecord {
     @Expose
     private String wind;
 
+    private int dailyWeatherId;
+    private String updatedAt;
+
     public HourlyWeather() {}
 
     public Integer getHourlyWeatherId() {
@@ -68,4 +71,19 @@ public class HourlyWeather extends SugarRecord {
         this.wind = wind;
     }
 
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public int getDailyWeatherId() {
+        return dailyWeatherId;
+    }
+
+    public void setDailyWeatherId(int dailyWeatherId) {
+        this.dailyWeatherId = dailyWeatherId;
+    }
 }

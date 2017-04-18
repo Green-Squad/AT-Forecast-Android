@@ -1,13 +1,11 @@
 package com.greensquad.atforecast.adapters;
 
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -42,6 +40,12 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         notifyItemRemoved(position);
     }
 
+    public void refill(ArrayList<State> states) {
+        mStates.clear();
+        mStates.addAll(states);
+        notifyDataSetChanged();
+    }
+
     public StateAdapter(ArrayList<State> states) {
         mStates = states;
     }
@@ -65,8 +69,9 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Gson gson = new Gson();
-                String shelterList = gson.toJson(state.getShelters());
+                String shelterList = gson.toJson(state.getSheltersFromDb());
 
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 ShelterListFragment shelterListFragment = ShelterListFragment.newInstance(stateName, shelterList);

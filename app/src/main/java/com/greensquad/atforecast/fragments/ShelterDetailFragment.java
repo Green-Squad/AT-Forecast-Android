@@ -2,25 +2,26 @@ package com.greensquad.atforecast.fragments;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
-import com.greensquad.atforecast.adapters.DailyWeatherAdapter;
 import com.greensquad.atforecast.R;
+import com.greensquad.atforecast.adapters.DailyWeatherAdapter;
 import com.greensquad.atforecast.base.BackButtonSupportFragment;
 import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.Shelter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,7 +62,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
         //final TextView shelterMile = (TextView) view.findViewById(R.id.shelter_mileage);
         //final TextView shelterElevation = (TextView) view.findViewById(R.id.shelter_elevation);
-        final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -69,8 +69,55 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
 
+
+        ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
+        List<DailyWeather> dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
+        if (dailyWeatherQuery.size() > 0) {
+            Date updatedAtDate = dailyWeatherQuery.get(0).getUpdatedAt();
+            int minutesUntilRefresh = 2 * 60;
+            int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(updatedAtDate);
+            long updatedAtDateInMillis = calendar.getTimeInMillis();
+            Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
+
+            Date currentDate = new Date(System.currentTimeMillis());
+
+            if(currentDate.after(timeToUpdate)) {
+                refresh();
+            } else {
+                Log.d(LOG_TAG, "Daily Weather > 0");
+                List<Shelter> shelterQuery = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString());
+                Shelter shelter = shelterQuery.get(0);
+                mShelterName = shelter.getName();
+                getActivity().setTitle(getTitle());
+                for (DailyWeather dailyWeather : dailyWeatherQuery) {
+                    dailyWeathers.add(dailyWeather);
+                }
+                mAdapter = new DailyWeatherAdapter(dailyWeathers);
+                recyclerView.setAdapter(mAdapter);
+            }
+        } else {
+            Log.d(LOG_TAG, "Daily Weather == 0");
+            refresh();
+        }
+        return view;
+    }
+
+    @Override
+    protected String getTitle() {
+        return mShelterName;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
+
+    private void refresh() {
+        final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
+        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
         Call<Shelter> call = apiService.getShelter(mShelterId);
         call.enqueue(new Callback<Shelter>() {
             @Override
@@ -84,27 +131,17 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
                 for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
                     dailyWeathers.add(dailyWeather);
+                    dailyWeather.save();
                 }
                 mAdapter = new DailyWeatherAdapter(dailyWeathers);
                 recyclerView.setAdapter(mAdapter);
             }
 
             @Override
-            public void onFailure(Call<Shelter>call, Throwable t) {
+            public void onFailure(Call<Shelter> call, Throwable t) {
                 Log.e(LOG_TAG, t.toString());
             }
         });
-        return view;
-    }
-
-    @Override
-    protected String getTitle() {
-        return mShelterName;
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return false;
     }
 
 }

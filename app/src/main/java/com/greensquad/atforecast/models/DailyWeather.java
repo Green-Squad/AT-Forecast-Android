@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
+import java.util.Date;
 import java.util.List;
 
 public class DailyWeather extends SugarRecord {
@@ -41,6 +42,8 @@ public class DailyWeather extends SugarRecord {
     @Expose
     @Ignore
     private List<HourlyWeather> hourlyWeather = null;
+
+    private Date updatedAt;
 
     public DailyWeather() {}
 
@@ -106,6 +109,24 @@ public class DailyWeather extends SugarRecord {
 
     public void setHourlyWeather(List<HourlyWeather> hourlyWeather) {
         this.hourlyWeather = hourlyWeather;
+    }
+
+    public List<HourlyWeather> getHourlyWeatherFromDb() {
+        return HourlyWeather.find(HourlyWeather.class, "daily_weather_id = ?", getDailyWeatherId() + "");
+    }
+
+    @Override
+    public long save() {
+        setUpdatedAt(new Date());
+        return super.save();
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Date getUpdatedAt() {
+        return  updatedAt;
     }
 
 }
