@@ -16,6 +16,7 @@ import com.greensquad.atforecast.adapters.DailyWeatherAdapter;
 import com.greensquad.atforecast.base.BackButtonSupportFragment;
 import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.DailyWeather;
+import com.greensquad.atforecast.models.HourlyWeather;
 import com.greensquad.atforecast.models.Shelter;
 
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             Date currentDate = new Date(System.currentTimeMillis());
 
             if(currentDate.after(timeToUpdate)) {
+                Log.d(LOG_TAG, "Time to refresh");
                 refresh();
             } else {
                 Log.d(LOG_TAG, "Daily Weather > 0");
@@ -128,10 +130,15 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
                 //shelterMile.setText(shelter.getMileage().toString());
                 //shelterElevation.setText(shelter.getElevation().toString());
-
+                DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", mShelterId + "");
                 for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
                     dailyWeathers.add(dailyWeather);
                     dailyWeather.save();
+                    HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
+                    for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
+                        hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
+                        hourlyWeather.save();
+                    }
                 }
                 mAdapter = new DailyWeatherAdapter(dailyWeathers);
                 recyclerView.setAdapter(mAdapter);

@@ -22,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import static android.support.v4.content.ContextCompat.getColor;
@@ -64,18 +63,6 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     public DailyWeatherAdapter(ArrayList<DailyWeather> myDailyWeathers) {
         mDailyWeathers = myDailyWeathers;
-        for (DailyWeather dw : myDailyWeathers) {
-            List<HourlyWeather> hourlyWeatherList = dw.getHourlyWeather();
-            if (hourlyWeatherList == null) {
-                hourlyWeatherList = dw.getHourlyWeatherFromDb();
-            } else {
-                for (HourlyWeather hw : hourlyWeatherList) {
-                    hw.setDailyWeatherId(dw.getDailyWeatherId());
-                    hw.save();
-                }
-            }
-        }
-
     }
 
     @Override
