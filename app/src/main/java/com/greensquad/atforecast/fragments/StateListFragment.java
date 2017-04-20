@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
@@ -101,6 +102,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 @Override
                 public void onFailure(Call<List<State>>call, Throwable t) {
                     loadingBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
                     Log.e(LOG_TAG, t.toString());
                 }
             });
@@ -139,6 +141,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                     @Override
                     public void onFailure(Call<List<State>>call, Throwable t) {
                         loadingBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
                         Log.e(LOG_TAG, t.toString());
                     }
                 });

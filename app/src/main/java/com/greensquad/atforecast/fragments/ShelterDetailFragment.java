@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
@@ -129,6 +130,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             @Override
             public void onResponse(Call<Shelter> call, Response<Shelter> response) {
                 Shelter shelter = response.body();
+                Log.d(LOG_TAG, shelter.getShelterId().toString());
                 mShelterName = shelter.getName();
                 getActivity().setTitle(getTitle());
 
@@ -149,6 +151,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             @Override
             public void onFailure(Call<Shelter> call, Throwable t) {
                 loadingBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
+                getFragmentManager().popBackStack();
                 Log.e(LOG_TAG, t.toString());
             }
         });
