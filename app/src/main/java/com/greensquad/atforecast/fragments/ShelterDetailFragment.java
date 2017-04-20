@@ -13,6 +13,7 @@ import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.adapters.DailyWeatherAdapter;
+import com.greensquad.atforecast.adapters.StateAdapter;
 import com.greensquad.atforecast.base.BackButtonSupportFragment;
 import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.DailyWeather;
@@ -61,22 +62,20 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
-        //final TextView shelterMile = (TextView) view.findViewById(R.id.shelter_mileage);
-        //final TextView shelterElevation = (TextView) view.findViewById(R.id.shelter_elevation);
-
         recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-
-
         ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
+        mAdapter = new DailyWeatherAdapter(dailyWeathers);
+        recyclerView.setAdapter(mAdapter);
+
         List<DailyWeather> dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
         if (dailyWeatherQuery.size() > 0) {
             Date updatedAtDate = dailyWeatherQuery.get(0).getUpdatedAt();
-            int minutesUntilRefresh = 2 * 60;
+            int minutesUntilRefresh = 1; //2 * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(updatedAtDate);
@@ -128,8 +127,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 mShelterName = shelter.getName();
                 getActivity().setTitle(getTitle());
 
-                //shelterMile.setText(shelter.getMileage().toString());
-                //shelterElevation.setText(shelter.getElevation().toString());
                 DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", mShelterId + "");
                 for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
                     dailyWeathers.add(dailyWeather);
@@ -140,8 +137,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                         hourlyWeather.save();
                     }
                 }
-                mAdapter = new DailyWeatherAdapter(dailyWeathers);
-                recyclerView.setAdapter(mAdapter);
+                ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
             }
 
             @Override

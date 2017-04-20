@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.HourlyWeather;
+import com.greensquad.atforecast.models.State;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +29,7 @@ import java.util.Locale;
 import static android.support.v4.content.ContextCompat.getColor;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> {
+    static final String LOG_TAG = DailyWeatherAdapter.class.getSimpleName();
     private ArrayList<DailyWeather> mDailyWeathers;
     private ViewGroup mParent;
     private Context context;
@@ -77,6 +80,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.d(LOG_TAG, "onBindViewHolder: " + position);
         DailyWeather dw = mDailyWeathers.get(position);
         String weatherDate = dw.getWeatherDate();
         Date parsedDate;
@@ -231,6 +235,13 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     @Override
     public int getItemCount() {
         return mDailyWeathers.size();
+    }
+
+    public void refill(ArrayList<DailyWeather> dailyWeathers) {
+        Log.d(LOG_TAG, "refill");
+        mDailyWeathers.clear();
+        mDailyWeathers.addAll(dailyWeathers);
+        notifyDataSetChanged();
     }
 
 }
