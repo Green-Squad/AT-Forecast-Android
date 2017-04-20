@@ -9,4 +9,11 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/gps"
+        android:orderInCategory="100"
+        android:icon="@drawable/my_location"
+        android:title="Find by location"
+        app:showAsAction="always" />
+
 </menu>
