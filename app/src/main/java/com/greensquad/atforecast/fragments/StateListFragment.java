@@ -52,6 +52,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_state_list, container, false);
         final ArrayList<State> states = new ArrayList<>();
+        final View loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -71,6 +72,9 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
             Log.d(LOG_TAG, "First Run");
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
             Call<List<State>> call = apiService.getStates(true);
+
+            loadingBar.setVisibility(View.VISIBLE);
+
             call.enqueue(new Callback<List<State>>() {
                 @Override
                 public void onResponse(Call<List<State>> call, Response<List<State>> response) {
@@ -89,12 +93,13 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
                     Log.d(LOG_TAG, dbShelters.size() + "");
 
-
+                    loadingBar.setVisibility(View.GONE);
                     ((StateAdapter)recyclerView.getAdapter()).refill(states);
                 }
 
                 @Override
                 public void onFailure(Call<List<State>>call, Throwable t) {
+                    loadingBar.setVisibility(View.GONE);
                     Log.e(LOG_TAG, t.toString());
                 }
             });
@@ -114,6 +119,9 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 Log.d(LOG_TAG, "Update Run");
                 ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
                 Call<List<State>> call = apiService.getStates(false);
+
+                loadingBar.setVisibility(View.VISIBLE);
+
                 call.enqueue(new Callback<List<State>>() {
                     @Override
                     public void onResponse(Call<List<State>> call, Response<List<State>> response) {
@@ -123,11 +131,13 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                             state.save();
                         }
 
+                        loadingBar.setVisibility(View.GONE);
                         ((StateAdapter)recyclerView.getAdapter()).refill(states);
                     }
 
                     @Override
                     public void onFailure(Call<List<State>>call, Throwable t) {
+                        loadingBar.setVisibility(View.GONE);
                         Log.e(LOG_TAG, t.toString());
                     }
                 });

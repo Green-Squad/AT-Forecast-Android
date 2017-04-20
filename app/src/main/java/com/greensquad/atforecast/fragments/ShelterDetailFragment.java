@@ -35,6 +35,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
+    private View loadingBar;
 
     private Integer mShelterId;
     private String mShelterName;
@@ -62,6 +63,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
+        loadingBar = getActivity().findViewById(R.id.loadingPanel);
+
         recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
         recyclerView.setHasFixedSize(true);
 
@@ -75,7 +78,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         List<DailyWeather> dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
         if (dailyWeatherQuery.size() > 0) {
             Date updatedAtDate = dailyWeatherQuery.get(0).getUpdatedAt();
-            int minutesUntilRefresh = 1; //2 * 60;
+            int minutesUntilRefresh = 2 * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(updatedAtDate);
@@ -86,6 +89,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
             if(currentDate.after(timeToUpdate)) {
                 Log.d(LOG_TAG, "Time to refresh");
+                loadingBar.setVisibility(View.VISIBLE);
                 refresh();
             } else {
                 Log.d(LOG_TAG, "Daily Weather > 0");
@@ -101,6 +105,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             }
         } else {
             Log.d(LOG_TAG, "Daily Weather == 0");
+            loadingBar.setVisibility(View.VISIBLE);
             refresh();
         }
         return view;
@@ -137,11 +142,13 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                         hourlyWeather.save();
                     }
                 }
+                loadingBar.setVisibility(View.GONE);
                 ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
             }
 
             @Override
             public void onFailure(Call<Shelter> call, Throwable t) {
+                loadingBar.setVisibility(View.GONE);
                 Log.e(LOG_TAG, t.toString());
             }
         });
