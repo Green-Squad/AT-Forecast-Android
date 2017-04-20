@@ -2,17 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/row_height"
-    android:paddingLeft="@dimen/default_spacing"
-    android:paddingRight="@dimen/default_spacing">
+    android:paddingStart="@dimen/default_spacing"
+    android:paddingEnd="@dimen/default_spacing">
 
     <TextView
         android:id="@+id/shelters_shelter_mileage"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:gravity="end|center_vertical"
+        android:textColor="@color/colorPrimary"
         android:layout_marginEnd="@dimen/default_spacing"
-        android:textColor="@color/black87"
-        android:textSize="16sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/shelters_shelter_name"
