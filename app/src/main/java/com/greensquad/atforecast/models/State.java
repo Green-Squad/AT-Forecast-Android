@@ -127,5 +127,8 @@ public class State extends SugarRecord implements Parcelable {
         return  updatedAt;
     }
 
+    public String getImageName() {
+        return name.replaceAll(" ", "_").toLowerCase();
+    }
 
 }

@@ -1,11 +1,13 @@
 package com.greensquad.atforecast.adapters;
 
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -18,15 +20,18 @@ import java.util.ArrayList;
 public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> {
     static final String LOG_TAG = StateAdapter.class.getSimpleName();
     private ArrayList<State> mStates;
+    private Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView temps;
+        public ImageView icon;
 
         public ViewHolder(View v) {
             super(v);
             name = (TextView) v.findViewById(R.id.state_name);
             temps = (TextView) v.findViewById(R.id.state_avg_temps);
+            icon = (ImageView) v.findViewById(R.id.state_icon);
         }
     }
 
@@ -54,6 +59,7 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
     public StateAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_state, parent, false);
+        context = parent.getContext();
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -63,6 +69,9 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         final State state = mStates.get(position);
         final String stateName = state.getName();
 
+        int imgId = context.getResources().getIdentifier(state.getImageName(), "drawable", context.getPackageName());
+
+        holder.icon.setImageResource(imgId);
         holder.name.setText(stateName);
         holder.temps.setText("State average: " + state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
 

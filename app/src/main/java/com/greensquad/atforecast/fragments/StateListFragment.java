@@ -66,7 +66,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         mAdapter = new StateAdapter(new ArrayList<State>(dbStates));
         recyclerView.setAdapter(mAdapter);
-        // first run
+        // first run2
         if (dbStates.isEmpty()) {
             Log.d(LOG_TAG, "First Run");
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
