@@ -2,6 +2,7 @@ package com.greensquad.atforecast.fragments;
 
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private View loadingBar;
+    private SwipeRefreshLayout swipeContainer;
 
     private Integer mShelterId;
     private String mShelterName;
@@ -62,7 +64,17 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary);
 
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
@@ -145,12 +157,14 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                     }
                 }
                 loadingBar.setVisibility(View.GONE);
+                swipeContainer.setRefreshing(false);
                 ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
             }
 
             @Override
             public void onFailure(Call<Shelter> call, Throwable t) {
                 loadingBar.setVisibility(View.GONE);
+                swipeContainer.setRefreshing(false);
                 Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
                 getFragmentManager().popBackStack();
                 Log.e(LOG_TAG, t.toString());

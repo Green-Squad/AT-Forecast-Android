@@ -3,6 +3,7 @@ package com.greensquad.atforecast.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,8 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
+    private SwipeRefreshLayout swipeContainer;
+    private View loadingBar;
 
     public StateListFragment() {}
 
@@ -52,8 +55,18 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_state_list, container, false);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary);
+
         final ArrayList<State> states = new ArrayList<>();
-        final View loadingBar = getActivity().findViewById(R.id.loadingPanel);
+        loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -120,36 +133,41 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
             if(currentDate.after(timeToUpdate)) {
                 Log.d(LOG_TAG, "Update Run");
-                ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-                Call<List<State>> call = apiService.getStates(false);
-
                 loadingBar.setVisibility(View.VISIBLE);
-
-                call.enqueue(new Callback<List<State>>() {
-                    @Override
-                    public void onResponse(Call<List<State>> call, Response<List<State>> response) {
-                        List<State> statesList = response.body();
-                        for (State state : statesList) {
-                            states.add(state);
-                            state.save();
-                        }
-
-                        loadingBar.setVisibility(View.GONE);
-                        ((StateAdapter)recyclerView.getAdapter()).refill(states);
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<State>>call, Throwable t) {
-                        loadingBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
-                        Log.e(LOG_TAG, t.toString());
-                    }
-                });
             }
         }
 
 
         return view;
+    }
+
+    private void refresh() {
+        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+        Call<List<State>> call = apiService.getStates(false);
+
+        call.enqueue(new Callback<List<State>>() {
+            @Override
+            public void onResponse(Call<List<State>> call, Response<List<State>> response) {
+                ArrayList<State> states = new ArrayList<>();
+                List<State> statesList = response.body();
+                for (State state : statesList) {
+                    states.add(state);
+                    state.save();
+                }
+
+                loadingBar.setVisibility(View.GONE);
+                swipeContainer.setRefreshing(false);
+                ((StateAdapter)recyclerView.getAdapter()).refill(states);
+            }
+
+            @Override
+            public void onFailure(Call<List<State>>call, Throwable t) {
+                loadingBar.setVisibility(View.GONE);
+                swipeContainer.setRefreshing(false);
+                Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
+                Log.e(LOG_TAG, t.toString());
+            }
+        });
     }
 
     @Override
