@@ -61,6 +61,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         recyclerView.addItemDecoration(itemDecoration);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setAutoMeasureEnabled(false);
         recyclerView.setLayoutManager(mLayoutManager);
 
         List<State> dbStates = State.listAll(State.class);
