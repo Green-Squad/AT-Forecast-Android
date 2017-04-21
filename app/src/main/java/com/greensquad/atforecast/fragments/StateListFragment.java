@@ -67,6 +67,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         final ArrayList<State> states = new ArrayList<>();
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
+        loadingBar.setVisibility(View.GONE);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
         recyclerView.setHasFixedSize(true);
