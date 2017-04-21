@@ -67,7 +67,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         final ArrayList<State> states = new ArrayList<>();
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
-        loadingBar.setVisibility(View.GONE);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -135,6 +134,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
             if(currentDate.after(timeToUpdate)) {
                 Log.d(LOG_TAG, "Update Run");
                 loadingBar.setVisibility(View.VISIBLE);
+                refresh();
             }
         }
 
