@@ -1,13 +1,18 @@
 package com.greensquad.atforecast;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +40,7 @@ public class MainActivity extends BaseActivity  implements ConnectionCallbacks, 
     private Toolbar toolbar;
     private GoogleApiClient mGoogleApiClient = null;
     protected Location mLastLocation;
+    private final static int MY_PERMISSIONS_LOCATION = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,22 +76,65 @@ public class MainActivity extends BaseActivity  implements ConnectionCallbacks, 
         switch (item.getItemId()) {
             // action with ID action_refresh was selected
             case R.id.gps:
-
-                try {
-                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                            mGoogleApiClient);
-                    if (mLastLocation != null) {
-                        Toast.makeText(this, String.valueOf(mLastLocation.getLatitude()) + " " + String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_SHORT).show();
-                    }
-                } catch(SecurityException se) {
-
+                Log.d(LOG_TAG, "GPS");
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(LOG_TAG, "GRANTED");
+                       findGPS();
+                    } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                            MY_PERMISSIONS_LOCATION);
+                    Log.d(LOG_TAG, "REQUEST");
                 }
+
+
                 break;
             default:
                 break;
         }
 
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    findGPS();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    private void findGPS() {
+        try {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            Log.d(LOG_TAG, "LAST LOCATION NULL?");
+            if (mLastLocation != null) {
+                Log.d(LOG_TAG, "NOT NULL");
+                Toast.makeText(this, String.valueOf(mLastLocation.getLatitude()) + " " + String.valueOf(mLastLocation.getLongitude()), Toast.LENGTH_SHORT).show();
+            }
+        } catch(SecurityException se) {
+
+        }
     }
 
     private void setupDrawerAndToggle() {
