@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,8 +20,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.greensquad.atforecast.base.BaseActivity;
+import com.greensquad.atforecast.fragments.ShelterListFragment;
 import com.greensquad.atforecast.fragments.StateListFragment;
+import com.greensquad.atforecast.models.Shelter;
+
+import java.util.List;
 
 import butterknife.OnItemClick;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
@@ -105,6 +111,21 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         Log.d(LOG_TAG, "WE HAVE A LOCATION");
         Log.d(LOG_TAG, location.getLatitude() + ", " + location.getLongitude());
         Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
+        List<Shelter> sheltersList = Shelter.findByNearestCoords(location.getLatitude(), location.getLongitude());
+        Gson gson = new Gson();
+        String shelterList = gson.toJson(sheltersList);
+        ShelterListFragment shelterListFragment = ShelterListFragment.newInstance("Current Location", shelterList);
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction().setCustomAnimations(
+                R.anim.fragment_slide_left_enter,
+                R.anim.fragment_slide_left_exit,
+                R.anim.fragment_slide_right_enter,
+                R.anim.fragment_slide_right_exit)
+                .replace(
+                        R.id.fragment_main,
+                        shelterListFragment,
+                        shelterListFragment.getTag()
+                ).addToBackStack("shelter_list_fragment").commit();
     }
 
     private void setupDrawerAndToggle() {

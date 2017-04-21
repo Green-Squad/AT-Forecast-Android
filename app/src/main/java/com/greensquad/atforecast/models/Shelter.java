@@ -6,6 +6,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Unique;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Shelter extends SugarRecord {
@@ -99,7 +100,7 @@ public class Shelter extends SugarRecord {
         this.stateId = stateId;
     }
 
-    public Integer findByNearestCoords(double latitude, double longitude) {
+    public static List<Shelter> findByNearestCoords(double latitude, double longitude) {
         double smallestDistance = Double.MAX_VALUE;
         Shelter smallestShelter = null;
 
@@ -115,8 +116,37 @@ public class Shelter extends SugarRecord {
                 smallestShelter = shelter;
             }
         }
+        List<Shelter> sheltersList= new ArrayList<Shelter>();
+        Shelter previous = smallestShelter.getPrevious();
+        Shelter next = smallestShelter.getNext();
 
-        return smallestShelter.getShelterId();
+        if (previous != null) {
+            sheltersList.add(previous);
+        }
+        sheltersList.add(smallestShelter);
+        if (next != null) {
+            sheltersList.add(next);
+        }
+
+        return sheltersList;
+    }
+
+    public Shelter getPrevious() {
+        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage < ?", mileage.toString());
+        Shelter shelter = null;
+        if (!shelterList.isEmpty()) {
+            shelter = shelterList.get(shelterList.size() - 1);
+        }
+        return  shelter;
+    }
+
+    public Shelter getNext() {
+        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage > ?", mileage.toString());
+        Shelter shelter = null;
+        if (!shelterList.isEmpty()) {
+            shelter = shelterList.get(0);
+        }
+        return  shelter;
     }
 
     // Use Latitude and Longitude coordinates
