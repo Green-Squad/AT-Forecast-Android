@@ -28,7 +28,6 @@ import com.greensquad.atforecast.models.Shelter;
 
 import java.util.List;
 
-import butterknife.OnItemClick;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationAccuracy;
@@ -158,7 +157,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         //drawerList.setAdapter(mAdapter);
     }
 
-    @OnItemClick(R.id.nav_view)
     public void onItemClick(int index) {
         switch (index) {
             case 0:
