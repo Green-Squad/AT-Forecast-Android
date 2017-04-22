@@ -117,16 +117,10 @@ public class Shelter extends SugarRecord {
             }
         }
         List<Shelter> sheltersList= new ArrayList<Shelter>();
-        Shelter previous = smallestShelter.getPrevious();
-        Shelter next = smallestShelter.getNext();
 
-        if (previous != null) {
-            sheltersList.add(previous);
-        }
+        sheltersList.addAll(smallestShelter.getPrevious(2));
         sheltersList.add(smallestShelter);
-        if (next != null) {
-            sheltersList.add(next);
-        }
+        sheltersList.addAll(smallestShelter.getNext(2));
 
         return sheltersList;
     }
@@ -147,6 +141,28 @@ public class Shelter extends SugarRecord {
             shelter = shelterList.get(0);
         }
         return  shelter;
+    }
+
+    public List<Shelter> getPrevious(int number) {
+        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage < ?", mileage.toString());
+        List<Shelter> returnedList = new ArrayList<>();
+        if (shelterList.size() <= number) {
+            returnedList = shelterList;
+        } else {
+            returnedList.addAll(shelterList.subList(shelterList.size() - number, shelterList.size()));
+        }
+        return returnedList;
+    }
+
+    public List<Shelter> getNext(int number) {
+        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage > ?", mileage.toString());
+        List<Shelter> returnedList = new ArrayList<>();
+        if (shelterList.size() <= number) {
+            returnedList = shelterList;
+        } else {
+            returnedList.addAll(shelterList.subList(0, number));
+        }
+        return returnedList;
     }
 
     // Use Latitude and Longitude coordinates
