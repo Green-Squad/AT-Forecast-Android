@@ -42,6 +42,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private NavigationView drawerList;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
+    private View loadingBar;
 
     private static final int LOCATION_PERMISSION_ID = 1001;
 
@@ -54,6 +55,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         drawerList = (NavigationView) findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        loadingBar = findViewById(R.id.loadingPanel);
 
         setupNavigationItems();
         setupDrawerAndToggle();
@@ -90,6 +92,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private void findGPS() {
         Log.d(LOG_TAG, "FIND GPS");
         Toast.makeText(getApplicationContext(), "Finding GPS", Toast.LENGTH_LONG).show();
+        loadingBar.setVisibility(View.VISIBLE);
         LocationParams params = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
                 .setDistance(1f)
@@ -103,14 +106,14 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             findGPS();
+        } else {
+            Toast.makeText(getApplicationContext(), "Location is required to find nearest shelter.", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void onLocationUpdated(Location location) {
-        Log.d(LOG_TAG, "WE HAVE A LOCATION");
-        Log.d(LOG_TAG, location.getLatitude() + ", " + location.getLongitude());
-        Toast.makeText(getApplicationContext(), location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_LONG).show();
+        loadingBar.setVisibility(View.GONE);
         List<Shelter> sheltersList = Shelter.findByNearestCoords(location.getLatitude(), location.getLongitude());
         Gson gson = new Gson();
         String shelterList = gson.toJson(sheltersList);
