@@ -86,7 +86,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         if (dbStates.isEmpty()) {
             Log.d(LOG_TAG, "First Run");
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-            Call<List<State>> call = apiService.getStates(true);
+            Call<List<State>> call = apiService.getStates(true, getString(R.string.atforecast_api_key));
 
             loadingBar.setVisibility(View.VISIBLE);
 
@@ -144,7 +144,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
     private void refresh() {
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-        Call<List<State>> call = apiService.getStates(false);
+        Call<List<State>> call = apiService.getStates(false, getString(R.string.atforecast_api_key));
 
         call.enqueue(new Callback<List<State>>() {
             @Override

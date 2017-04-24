@@ -137,7 +137,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private void refresh() {
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-        Call<Shelter> call = apiService.getShelter(mShelterId);
+        Call<Shelter> call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key));
         call.enqueue(new Callback<Shelter>() {
             @Override
             public void onResponse(Call<Shelter> call, Response<Shelter> response) {
