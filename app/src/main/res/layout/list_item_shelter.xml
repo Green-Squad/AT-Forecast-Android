@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/row_height"
     android:paddingStart="@dimen/default_spacing"
-    android:paddingEnd="@dimen/default_spacing">
+    android:paddingEnd="@dimen/default_spacing"
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/shelters_shelter_mileage"

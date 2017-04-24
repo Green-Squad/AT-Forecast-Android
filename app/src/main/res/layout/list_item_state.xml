@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/row_height"
     android:paddingLeft="@dimen/default_spacing"
-    android:paddingRight="@dimen/default_spacing">
+    android:paddingRight="@dimen/default_spacing"
+    android:background="?android:attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/state_icon"
