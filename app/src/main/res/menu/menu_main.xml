@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.greensquad.atforecast.MainActivity">
 
-    <item
+    <!--<item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 
     <item
         android:id="@+id/gps"
         android:orderInCategory="100"
         android:icon="@drawable/my_location"
         android:title="Find by location"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>
