@@ -1,7 +1,6 @@
 package com.greensquad.atforecast.fragments;
 
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
