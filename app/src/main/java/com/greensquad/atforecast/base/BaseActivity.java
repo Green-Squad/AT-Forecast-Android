@@ -37,9 +37,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         if (fragmentManager.getBackStackEntryCount() > 1) {
             drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener); //pop backstack
         } else {
-            drawerToggle.setDrawerIndicatorEnabled(true);
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             drawerToggle.setToolbarNavigationClickListener(drawerToggle.getToolbarNavigationClickListener()); //open nav menu drawer
         }
     }
@@ -55,27 +57,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getDrawer().addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                syncDrawerToggleState();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                syncDrawerToggleState();
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });
     }
 
     @Override
@@ -111,11 +92,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private boolean sendBackPressToDrawer() {
-        DrawerLayout drawer = getDrawer();
-        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
-        }
         return false;
     }
 
@@ -133,5 +109,4 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract ActionBarDrawerToggle getDrawerToggle();
 
-    protected abstract DrawerLayout getDrawer();
 }

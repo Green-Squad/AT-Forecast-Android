@@ -1,6 +1,7 @@
 package com.greensquad.atforecast;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -38,8 +39,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView drawerList;
-    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private View loadingBar;
 
@@ -51,12 +50,9 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        drawerList = (NavigationView) findViewById(R.id.nav_view);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         loadingBar = findViewById(R.id.loadingPanel);
 
-        setupNavigationItems();
         setupDrawerAndToggle();
         showStateList();
     }
@@ -130,57 +126,17 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                 ).addToBackStack("shelter_list_fragment").commit();
     }
 
-    private void setupDrawerAndToggle() {
+   private void setupDrawerAndToggle() {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                setDrawerIndicatorEnabled(true);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-        };
-        drawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle = new ActionBarDrawerToggle(this, new DrawerLayout(this), toolbar, 0, 0);
         mDrawerToggle.syncState();
-    }
-
-    private void setupNavigationItems() {
-        String[] navigationItems = {"Books", "Random Book", "Settings"};
-        ArrayAdapter<String> mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, navigationItems);
-        //drawerList.setAdapter(mAdapter);
-    }
-
-    public void onItemClick(int index) {
-        switch (index) {
-            case 0:
-                //showBookingList();
-                break;
-            case 1:
-                //showRandom();
-                break;
-            case 2:
-                //showSettings();
-                break;
-            default:
-                break;
-        }
-        drawerLayout.closeDrawer(drawerList);
     }
 
     private void showStateList() {
         add(StateListFragment.newInstance());
-    }
-
-    @Override
-    protected DrawerLayout getDrawer() {
-        return drawerLayout;
     }
 
     @Override
