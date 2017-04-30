@@ -1,6 +1,7 @@
 package com.greensquad.atforecast.fragments;
 
 
+import android.animation.Animator;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.R;
@@ -34,6 +37,7 @@ import retrofit2.Response;
 public class ShelterDetailFragment extends BaseFragment implements BackButtonSupportFragment {
     private static final String LOG_TAG = ShelterDetailFragment.class.getSimpleName();
     private static final String ARG_SHELTER_ID = "shelter_id";
+    private static  final int ANIM_DURATION = 300;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -71,7 +75,25 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh();
+                YoYo.with(Techniques.SlideOutRight)
+                        .duration(ANIM_DURATION)
+                        .repeat(1)
+                        .withListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {}
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                refresh();
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {}
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {}
+                        })
+                        .playOn(recyclerView);
             }
         });
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
@@ -159,6 +181,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 loadingBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
                 ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
+                slideInAnimation();
             }
 
             @Override
@@ -168,8 +191,16 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
                 getFragmentManager().popBackStack();
                 Log.e(LOG_TAG, t.toString());
+                slideInAnimation();
             }
         });
+    }
+
+    public void slideInAnimation() {
+        YoYo.with(Techniques.SlideInLeft)
+                .duration(ANIM_DURATION)
+                .repeat(1)
+                .playOn(recyclerView);
     }
 
 }
