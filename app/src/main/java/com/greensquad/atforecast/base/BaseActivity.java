@@ -36,19 +36,15 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void syncDrawerToggleState() {
-        Log.d(LOG_TAG, "syncDrawerToggleState");
         ActionBarDrawerToggle drawerToggle = getDrawerToggle();
         if (drawerToggle == null) {
-            Log.d(LOG_TAG, "drawerToggle null");
             return;
         }
         if (fragmentManager.getBackStackEntryCount() > 1) {
-            Log.d(LOG_TAG, "backstack > 1");
             drawerToggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener); //pop backstack
         } else {
-            Log.d(LOG_TAG, "backstack <= 1");
             drawerToggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
