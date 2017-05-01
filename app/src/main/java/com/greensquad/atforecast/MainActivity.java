@@ -116,7 +116,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         List<Shelter> sheltersList = Shelter.findByNearestCoords(location.getLatitude(), location.getLongitude());
         Gson gson = new Gson();
         String shelterList = gson.toJson(sheltersList);
-        ShelterListFragment shelterListFragment = ShelterListFragment.newInstance("Current Location", shelterList);
+        ShelterListFragment shelterListFragment = ShelterListFragment.newInstance("Nearest Shelters", shelterList);
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().setCustomAnimations(
                 R.anim.fragment_slide_left_enter,
