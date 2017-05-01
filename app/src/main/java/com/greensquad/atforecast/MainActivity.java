@@ -56,6 +56,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         setupDrawerAndToggle();
         if (savedInstanceState == null) {
             showStateList();
+        } else {
+            syncDrawerToggleState();
         }
     }
 
@@ -130,9 +132,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
    private void setupDrawerAndToggle() {
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
         mDrawerToggle = new ActionBarDrawerToggle(this, new DrawerLayout(this), toolbar, 0, 0);
         mDrawerToggle.syncState();
     }
