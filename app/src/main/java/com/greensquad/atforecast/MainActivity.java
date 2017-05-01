@@ -54,7 +54,9 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         loadingBar = findViewById(R.id.loadingPanel);
 
         setupDrawerAndToggle();
-        showStateList();
+        if (savedInstanceState == null) {
+            showStateList();
+        }
     }
 
     @Override
