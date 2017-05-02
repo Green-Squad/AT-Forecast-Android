@@ -30,21 +30,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#59000000"
-                android:padding="16dp"
+                android:padding="@dimen/default_spacing"
                 android:layout_alignBottom="@id/weather_img">
 
                 <TextView
                     android:id="@+id/date"
                     android:layout_width="match_parent"
                     android:layout_height="26dip"
-                    android:textColor="#ffffff"
+                    android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/temps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
+                    android:textColor="@color/white"
                     android:layout_below="@id/date"
                     android:layout_marginEnd="12dp"
                     android:textSize="12sp" />
@@ -53,7 +53,7 @@
                     android:id="@+id/condition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
+                    android:textColor="@color/white"
                     android:layout_below="@id/date"
                     android:layout_toEndOf="@id/temps"
                     android:textSize="12sp" />

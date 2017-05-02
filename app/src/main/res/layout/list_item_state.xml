@@ -27,14 +27,14 @@
             android:id="@+id/state_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black87"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/state_avg_temps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black54"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp" />
 
     </LinearLayout>

@@ -1,24 +1,23 @@
 package com.greensquad.atforecast;
 
 import android.Manifest;
-import android.app.ActionBar;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -41,6 +40,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar toolbar;
     private View loadingBar;
+    private SharedPreferences sharedPref;
 
     private static final int LOCATION_PERMISSION_ID = 1001;
 
@@ -59,6 +59,13 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         } else {
             syncDrawerToggleState();
         }
+
+        if (savedInstanceState == null) {
+            sharedPref = getPreferences(Context.MODE_PRIVATE);
+            int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
+            int nightMode = sharedPref.getInt("nightMode", defaultValue);
+            setNightMode(nightMode, false);
+        }
     }
 
     @Override
@@ -69,27 +76,58 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        switch (AppCompatDelegate.getDefaultNightMode()) {
+            case AppCompatDelegate.MODE_NIGHT_AUTO:
+                menu.findItem(R.id.menu_night_mode_auto).setChecked(true);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                menu.findItem(R.id.menu_night_mode_night).setChecked(true);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                menu.findItem(R.id.menu_night_mode_day).setChecked(true);
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // action with ID action_refresh was selected
             case R.id.gps:
                 // Location permission not granted
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_ID);
                     return false;
                 }
-
                 findGPS();
                 break;
-            default:
+            case R.id.menu_night_mode_day:
+                setNightMode(AppCompatDelegate.MODE_NIGHT_NO, true);
+                break;
+            case R.id.menu_night_mode_night:
+                setNightMode(AppCompatDelegate.MODE_NIGHT_YES, true);
+                break;
+            case R.id.menu_night_mode_auto:
+                setNightMode(AppCompatDelegate.MODE_NIGHT_AUTO, true);
                 break;
         }
 
-        return true;
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setNightMode(@AppCompatDelegate.NightMode int nightMode, boolean setNew) {
+        AppCompatDelegate.setDefaultNightMode(nightMode);
+        if(setNew) {
+            sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("nightMode", nightMode);
+            editor.commit();
+            recreate();
+        }
     }
 
     private void findGPS() {
-        Log.d(LOG_TAG, "FIND GPS");
         Toast.makeText(getApplicationContext(), "Finding GPS", Toast.LENGTH_LONG).show();
         loadingBar.setVisibility(View.VISIBLE);
         LocationParams params = new LocationParams.Builder()

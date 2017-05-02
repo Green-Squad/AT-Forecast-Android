@@ -6,11 +6,11 @@
 
     <color name="tableHeaderText">#8b8b8b</color>
     <color name="tableRowText">#2f2f2f</color>
-    <color name="rowBorder">#e8e8e8</color>
+    <color name="rowBorder">#888888</color>
 
-    <color name="textColorPrimary">#212121</color>
-    <color name="textColorSecondary">#757575</color>
-    <color name="textColorHighlight">#2980b9</color>
+    <color name="textColorPrimary">#dedede</color>
+    <color name="textColorSecondary">#8a8a8a</color>
+    <color name="textColorHighlight">#359fe4</color>
 
     <color name="white">#ffffff</color>
 </resources>
