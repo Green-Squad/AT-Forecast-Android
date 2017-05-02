@@ -1,15 +1,22 @@
 package com.greensquad.atforecast.models;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.greensquad.atforecast.MainActivity;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Unique;
+import com.orm.query.Condition;
+import com.orm.query.Select;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Shelter extends SugarRecord {
+
+    static final String LOG_TAG = Shelter.class.getSimpleName();
 
     @SerializedName("shelter_id")
     @Expose
@@ -141,6 +148,12 @@ public class Shelter extends SugarRecord {
             shelter = shelterList.get(0);
         }
         return  shelter;
+    }
+
+    public static Shelter findByNearestMileage(double mileage) {
+        List<Shelter> shelters = Select.from(Shelter.class).orderBy("ABS(" + mileage + "- mileage)").list();
+        return shelters.get(0);
+
     }
 
     public List<Shelter> getPrevious(int number) {

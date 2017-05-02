@@ -1,6 +1,7 @@
 package com.greensquad.atforecast;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,10 +11,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.greensquad.atforecast.base.BaseActivity;
+import com.greensquad.atforecast.fragments.ShelterDetailFragment;
 import com.greensquad.atforecast.fragments.ShelterListFragment;
 import com.greensquad.atforecast.fragments.StateListFragment;
 import com.greensquad.atforecast.models.Shelter;
@@ -70,8 +76,31 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        final Menu fMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        searchView.setQueryHint("NOBO Mile. e.g. 630");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchByMileage(query);
+                searchView.setIconified(true);
+                MenuItemCompat.collapseActionView(fMenu.findItem(R.id.search));
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -137,6 +166,27 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                 .build();
         SmartLocation smart = new SmartLocation.Builder(this).logging(true).build();
         smart.location().config(params).oneFix().start(this);
+    }
+
+    private void searchByMileage(String query) {
+        try {
+            double mileage = Double.parseDouble(query);
+            Shelter shelter = Shelter.findByNearestMileage(mileage);
+            ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getShelterId());
+            FragmentManager manager = getSupportFragmentManager();
+            manager.beginTransaction().setCustomAnimations(
+                    R.anim.fragment_slide_left_enter,
+                    R.anim.fragment_slide_left_exit,
+                    R.anim.fragment_slide_right_enter,
+                    R.anim.fragment_slide_right_exit)
+                    .replace(
+                            R.id.fragment_main,
+                            shelterDetailFragment,
+                            shelterDetailFragment.getTag()
+                    ).addToBackStack("shelter_detail_fragment").commit();
+        } catch (NumberFormatException nfe) {
+            Toast.makeText(getApplicationContext(), "You must enter a valid mile number.", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

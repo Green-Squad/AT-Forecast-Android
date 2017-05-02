@@ -6,4 +6,5 @@
     <string name="menu_night_mode_night">Night (always)</string>
     <string name="menu_night_mode_auto">Auto</string>
     <string name="menu_gps">Find by location</string>
+    <string name="menu_search">Search by mileage</string>
 </resources>

@@ -80,7 +80,6 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.d(LOG_TAG, "onBindViewHolder: " + position);
         DailyWeather dw = mDailyWeathers.get(position);
         String weatherDate = dw.getWeatherDate();
         Date parsedDate;
@@ -238,7 +237,6 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     }
 
     public void refill(ArrayList<DailyWeather> dailyWeathers) {
-        Log.d(LOG_TAG, "refill");
         mDailyWeathers.clear();
         mDailyWeathers.addAll(dailyWeathers);
         notifyDataSetChanged();

@@ -123,11 +123,9 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             Date currentDate = new Date(System.currentTimeMillis());
 
             if(currentDate.after(timeToUpdate)) {
-                Log.d(LOG_TAG, "Time to refresh");
                 loadingBar.setVisibility(View.VISIBLE);
                 refresh();
             } else {
-                Log.d(LOG_TAG, "Daily Weather > 0");
                 List<Shelter> shelterQuery = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString());
                 Shelter shelter = shelterQuery.get(0);
                 mShelterName = shelter.getName();
@@ -139,7 +137,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 recyclerView.setAdapter(mAdapter);
             }
         } else {
-            Log.d(LOG_TAG, "Daily Weather == 0");
             loadingBar.setVisibility(View.VISIBLE);
             refresh();
         }
@@ -164,7 +161,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             @Override
             public void onResponse(Call<Shelter> call, Response<Shelter> response) {
                 Shelter shelter = response.body();
-                Log.d(LOG_TAG, shelter.getShelterId().toString());
                 mShelterName = shelter.getName();
                 getActivity().setTitle(getTitle());
 

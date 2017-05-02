@@ -106,7 +106,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         recyclerView.setAdapter(mAdapter);
         // first run2
         if (dbStates.isEmpty()) {
-            Log.d(LOG_TAG, "First Run");
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
             Call<List<State>> call = apiService.getStates(true, getString(R.string.atforecast_api_key));
 
@@ -128,8 +127,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
                     List<Shelter> dbShelters = Shelter.listAll(Shelter.class);
 
-                    Log.d(LOG_TAG, dbShelters.size() + "");
-
                     loadingBar.setVisibility(View.GONE);
                     ((StateAdapter)recyclerView.getAdapter()).refill(states);
                 }
@@ -142,7 +139,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 }
             });
         } else {
-            Log.d(LOG_TAG, "Potential Update Run");
             Date updatedAtDate = dbStates.get(0).getUpdatedAt();
             int minutesUntilRefresh = 12 * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
@@ -154,7 +150,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
             Date currentDate = new Date(System.currentTimeMillis());
 
             if(currentDate.after(timeToUpdate)) {
-                Log.d(LOG_TAG, "Update Run");
                 loadingBar.setVisibility(View.VISIBLE);
                 refresh();
             }
