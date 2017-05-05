@@ -36,13 +36,9 @@ import retrofit2.Response;
 
 public class StateListFragment extends BaseFragment implements BackButtonSupportFragment{
     private static final String LOG_TAG = StateListFragment.class.getSimpleName();
-    private static final String ARG_STATE_LIST = "states";
     private static  final int ANIM_DURATION = 300;
 
-    private String[] titlesArray;
-
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
     private SwipeRefreshLayout swipeContainer;
     private View loadingBar;
 
@@ -61,6 +57,10 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         View view = inflater.inflate(R.layout.fragment_state_list, container, false);
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
+        loadingBar = getActivity().findViewById(R.id.loadingPanel);
+
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -85,12 +85,9 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                         .playOn(recyclerView);
             }
         });
-        swipeContainer.setColorSchemeResources(R.color.colorPrimary);
 
         final ArrayList<State> states = new ArrayList<>();
-        loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
@@ -102,9 +99,9 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         List<State> dbStates = State.listAll(State.class);
 
-        mAdapter = new StateAdapter(new ArrayList<State>(dbStates));
+        RecyclerView.Adapter mAdapter = new StateAdapter(new ArrayList<>(dbStates));
         recyclerView.setAdapter(mAdapter);
-        // first run2
+
         if (dbStates.isEmpty()) {
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
             Call<List<State>> call = apiService.getStates(true, getString(R.string.atforecast_api_key));
@@ -125,8 +122,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                         }
                     }
 
-                    List<Shelter> dbShelters = Shelter.listAll(Shelter.class);
-
                     loadingBar.setVisibility(View.GONE);
                     ((StateAdapter)recyclerView.getAdapter()).refill(states);
                 }
@@ -142,11 +137,12 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
             Date updatedAtDate = dbStates.get(0).getUpdatedAt();
             int minutesUntilRefresh = 12 * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
+
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(updatedAtDate);
             long updatedAtDateInMillis = calendar.getTimeInMillis();
-            Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
 
+            Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
             Date currentDate = new Date(System.currentTimeMillis());
 
             if(currentDate.after(timeToUpdate)) {
@@ -154,7 +150,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 refresh();
             }
         }
-
 
         return view;
     }

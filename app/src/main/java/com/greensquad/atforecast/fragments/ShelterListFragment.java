@@ -53,7 +53,6 @@ public class ShelterListFragment extends BaseFragment implements BackButtonSuppo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter_list, container, false);
-        final ArrayList<Shelter> shelters = new ArrayList<>();
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.shelters_recycler_view);
         recyclerView.setHasFixedSize(true);

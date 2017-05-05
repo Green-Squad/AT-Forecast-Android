@@ -60,8 +60,7 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_state, parent, false);
         context = parent.getContext();
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ViewHolder(v);
     }
 
     @Override

@@ -1,22 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.greensquad.atforecast.fragments.ShelterDetailFragment"
-    android:orientation="vertical">
+    android:id="@+id/swipeContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/swipeContainer"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/shelter_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/shelter_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:scrollbars="vertical" />
 
-    </android.support.v4.widget.SwipeRefreshLayout>
-</LinearLayout>
+        <com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader
+            android:id="@+id/shelter_recycler_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/card_spacing">
+
+            <RelativeLayout
+                android:id="@+id/shelter_recycler_header_relative_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/next_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="0dp"
+                    app:backgroundTint="@color/buttonColorBackground"
+                    android:textColor="@color/buttonColorText"
+                    android:text="@string/string_button_next" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/previous_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/next_button"
+                    app:backgroundTint="@color/buttonColorBackground"
+                    android:textColor="@color/buttonColorText"
+                    android:text="@string/string_button_previous" />
+
+                <TextView
+                    android:id="@+id/text_last_updated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/previous_button"
+                    android:layout_marginStart="4dp"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+        </com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v4.widget.SwipeRefreshLayout>

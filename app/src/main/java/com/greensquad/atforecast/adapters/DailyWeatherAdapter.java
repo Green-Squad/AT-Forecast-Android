@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.HourlyWeather;
-import com.greensquad.atforecast.models.State;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,8 +72,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
                 .inflate(R.layout.list_item_forecast, parent, false);
         mParent = parent;
         context = parent.getContext();
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ViewHolder(v);
     }
 
     @Override

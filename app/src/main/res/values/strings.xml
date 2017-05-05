@@ -7,4 +7,8 @@
     <string name="menu_night_mode_auto">Auto</string>
     <string name="menu_gps">Find by location</string>
     <string name="menu_search">Search by mileage</string>
+    <string name="string_button_next">Next</string>
+    <string name="string_button_previous">Previous</string>
+    <string name="string_last_updated">Last updated</string>
+    <string name="string_last_updated_now">Last updated just now.</string>
 </resources>
