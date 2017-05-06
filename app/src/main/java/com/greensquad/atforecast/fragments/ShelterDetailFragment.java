@@ -266,7 +266,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 swipeContainer.setRefreshing(false);
 
                 Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
-                getFragmentManager().popBackStack();
+                //getFragmentManager().popBackStack();
                 Log.e(LOG_TAG, t.toString());
 
                 if(animationEnabled){
