@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,7 +43,9 @@ import static android.text.format.DateUtils.getRelativeTimeSpanString;
 public class ShelterDetailFragment extends BaseFragment implements BackButtonSupportFragment {
     private static final String LOG_TAG = ShelterDetailFragment.class.getSimpleName();
     private static final String ARG_SHELTER_ID = "shelter_id";
-    private static  final int ANIM_DURATION = 300;
+    private static final int ANIM_DURATION = 300;
+    private static final Integer DIST_MILES = 100;
+    private static final int MINUTES_UNTIL_REFRESH = 2;
 
     private ConstraintLayout constraintLayout;
     private RecyclerView recyclerView;
@@ -160,7 +161,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         List<DailyWeather> dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
         if (dailyWeatherQuery.size() > 0) {
             Date updatedAtDate = dailyWeatherQuery.get(0).getUpdatedAt();
-            int minutesUntilRefresh = 2 * 60;
+            int minutesUntilRefresh = MINUTES_UNTIL_REFRESH * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
 
             Calendar calendar = Calendar.getInstance();
@@ -237,11 +238,12 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
 
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-        Call<Shelter> call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key));
-        call.enqueue(new Callback<Shelter>() {
+        Call<List<Shelter>> call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), null);
+        call.enqueue(new Callback<List<Shelter>>() {
             @Override
-            public void onResponse(Call<Shelter> call, Response<Shelter> response) {
-                Shelter shelter = response.body();
+            public void onResponse(Call<List<Shelter>> call, Response<List<Shelter>> response) {
+                List<Shelter> shelters = response.body();
+                Shelter shelter = shelters.get(0);
                 mShelterName = shelter.getName();
                 getActivity().setTitle(getTitle());
 
@@ -262,16 +264,49 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 if(animationEnabled){
                     slideInAnimation();
                 }
+
+                ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+
+                call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), DIST_MILES);
+                call.enqueue(new Callback<List<Shelter>>() {
+
+                    @Override
+                    public void onResponse(Call<List<Shelter>> call, Response<List<Shelter>> response) {
+                        final List<Shelter> shelters = response.body();
+                        new Thread(new Runnable() {
+                            public void run() {
+                                for (Shelter shelter : shelters) {
+                                    DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", shelter.getShelterId() + "");
+                                    for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
+                                        dailyWeathers.add(dailyWeather);
+                                        dailyWeather.save();
+                                        HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
+                                        for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
+                                            hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
+                                            hourlyWeather.save();
+                                        }
+                                    }
+                                }
+                            }
+                        }).start();
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Shelter>> call, Throwable t) {
+                        Toast.makeText(getContext(), "Sorry, we could not load the next " + DIST_MILES + " miles. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
-            public void onFailure(Call<Shelter> call, Throwable t) {
+            public void onFailure(Call<List<Shelter>> call, Throwable t) {
                 loadingBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
 
-                Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
-                //getFragmentManager().popBackStack();
-                Log.e(LOG_TAG, t.toString());
+                lastUpdatedTextView.setText("Update failed.");
+
+                Toast.makeText(getContext(), "Sorry we could not load the weather for this shelter. Please try again.", Toast.LENGTH_SHORT).show();
 
                 if(animationEnabled){
                     slideInAnimation();

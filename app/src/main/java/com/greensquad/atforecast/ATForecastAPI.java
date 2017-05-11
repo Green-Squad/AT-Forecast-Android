@@ -16,5 +16,5 @@ public interface ATForecastAPI {
     Call<List<State>> getStates(@Query("include_shelters") boolean includeShelters, @Query("api_key") String apiKey);
 
     @GET("/shelters/{id}.json")
-    Call<Shelter> getShelter(@Path("id") Integer id, @Query("api_key") String apiKey);
+    Call<List<Shelter>> getShelter(@Path("id") Integer id, @Query("api_key") String apiKey, @Query("dist_miles") Integer distMiles);
 }

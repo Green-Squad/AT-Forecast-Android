@@ -65,12 +65,12 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             syncDrawerToggleState();
         }
 
-        if (savedInstanceState == null) {
-            sharedPref = getPreferences(Context.MODE_PRIVATE);
-            int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
-            int nightMode = sharedPref.getInt("nightMode", defaultValue);
-            setNightMode(nightMode, false);
-        }
+
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
+        int nightMode = sharedPref.getInt("nightMode", defaultValue);
+        setNightMode(nightMode, false);
+
     }
 
     @Override
