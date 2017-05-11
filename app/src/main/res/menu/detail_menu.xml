@@ -4,19 +4,11 @@
     tools:context="com.greensquad.atforecast.MainActivity">
 
     <item
-        android:id="@+id/search"
-        android:orderInCategory="1"
-        android:icon="@drawable/ic_search"
-        android:title="@string/menu_search"
-        app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
-
-    <item
         android:id="@+id/gps"
         android:orderInCategory="2"
         android:icon="@drawable/ic_my_location"
         android:title="@string/menu_gps"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_night"

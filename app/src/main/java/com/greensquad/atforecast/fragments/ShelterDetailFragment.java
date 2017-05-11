@@ -10,6 +10,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -75,6 +77,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
+
+        setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
@@ -291,6 +295,13 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     @Override
     public boolean onBackPressed() {
         return false;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().getMenuInflater().inflate(R.menu.detail_menu, menu);
     }
 
 }

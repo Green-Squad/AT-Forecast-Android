@@ -1,5 +1,6 @@
 package com.greensquad.atforecast.adapters;
 
+import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -62,20 +63,27 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getShelterId());
-                FragmentManager manager = activity.getSupportFragmentManager();
-                manager.beginTransaction().setCustomAnimations(
-                        R.anim.fragment_slide_left_enter,
-                        R.anim.fragment_slide_left_exit,
-                        R.anim.fragment_slide_right_enter,
-                        R.anim.fragment_slide_right_exit)
-                    .replace(
-                        R.id.fragment_main,
-                        shelterDetailFragment,
-                        shelterDetailFragment.getTag()
-                ).addToBackStack("shelter_detail_fragment").commit();
+            public void onClick(final View v) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                        ShelterDetailFragment shelterDetailFragment = ShelterDetailFragment.newInstance(shelter.getShelterId());
+                        FragmentManager manager = activity.getSupportFragmentManager();
+                        manager.beginTransaction().setCustomAnimations(
+                                R.anim.fragment_slide_left_enter,
+                                R.anim.fragment_slide_left_exit,
+                                R.anim.fragment_slide_right_enter,
+                                R.anim.fragment_slide_right_exit)
+                                .replace(
+                                        R.id.fragment_main,
+                                        shelterDetailFragment,
+                                        shelterDetailFragment.getTag()
+                                ).addToBackStack("shelter_detail_fragment").commit();
+                    }
+                }, 50);
+
+
             }
         });
     }
