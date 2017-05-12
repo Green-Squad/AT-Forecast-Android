@@ -43,8 +43,8 @@ import static android.text.format.DateUtils.getRelativeTimeSpanString;
 public class ShelterDetailFragment extends BaseFragment implements BackButtonSupportFragment {
     private static final String LOG_TAG = ShelterDetailFragment.class.getSimpleName();
     private static final String ARG_SHELTER_ID = "shelter_id";
-    private static final int ANIM_DURATION = 300;
     private static final Integer DIST_MILES = 100;
+    private static final int ANIM_DURATION = 300;
     private static final int MINUTES_UNTIL_REFRESH = 2;
 
     private ConstraintLayout constraintLayout;
@@ -234,7 +234,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     }
 
     private void refresh(final boolean animationEnabled) {
-        lastUpdatedTextView.setText(R.string.string_last_updated_now);
         final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
 
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
@@ -260,6 +259,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 loadingBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
                 ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
+
+                lastUpdatedTextView.setText(R.string.string_last_updated_now);
 
                 if(animationEnabled){
                     slideInAnimation();
