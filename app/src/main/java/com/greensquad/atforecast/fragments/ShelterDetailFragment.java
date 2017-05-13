@@ -45,7 +45,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private static final String ARG_SHELTER_ID = "shelter_id";
     private static final Integer DIST_MILES = 100;
     private static final int ANIM_DURATION = 300;
-    private static final int MINUTES_UNTIL_REFRESH = 2;
+    private static final int MINUTES_UNTIL_REFRESH = 2 * 60;
 
     private ConstraintLayout constraintLayout;
     private RecyclerView recyclerView;
@@ -179,8 +179,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             mAdapter = new DailyWeatherAdapter(dailyWeathers);
             recyclerView.setAdapter(mAdapter);
 
-            int minutesUntilRefresh = MINUTES_UNTIL_REFRESH * 60;
-            int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
+            int millisecondsUntilRefresh = 1000 * 60 * MINUTES_UNTIL_REFRESH;
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(updatedAtDate);
