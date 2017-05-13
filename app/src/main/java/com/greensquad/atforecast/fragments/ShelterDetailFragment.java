@@ -56,6 +56,7 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private Shelter mShelter;
     private Integer mShelterId;
     private String mShelterName;
+    private List<DailyWeather> dailyWeatherQuery;
 
     public ShelterDetailFragment() {}
 
@@ -158,9 +159,26 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         RecyclerView.Adapter mAdapter = new DailyWeatherAdapter(dailyWeathers);
         recyclerView.setAdapter(mAdapter);
 
-        List<DailyWeather> dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
+        dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
         if (dailyWeatherQuery.size() > 0) {
             Date updatedAtDate = dailyWeatherQuery.get(0).getUpdatedAt();
+
+            String lastUpdatedTime = (String) getRelativeTimeSpanString(updatedAtDate.getTime());
+            lastUpdatedTime = getString(R.string.string_last_updated) + " " + lastUpdatedTime + ".";
+            lastUpdatedTextView.setText(lastUpdatedTime);
+
+            List<Shelter> shelterQuery = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString());
+            Shelter shelter = shelterQuery.get(0);
+            mShelterName = shelter.getName();
+            getActivity().setTitle(getTitle());
+
+            for (DailyWeather dailyWeather : dailyWeatherQuery) {
+                dailyWeathers.add(dailyWeather);
+            }
+
+            mAdapter = new DailyWeatherAdapter(dailyWeathers);
+            recyclerView.setAdapter(mAdapter);
+
             int minutesUntilRefresh = MINUTES_UNTIL_REFRESH * 60;
             int millisecondsUntilRefresh = 1000 * 60 * minutesUntilRefresh;
 
@@ -174,22 +192,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             if(currentDate.after(timeToUpdate)) {
                 loadingBar.setVisibility(View.VISIBLE);
                 refresh(false);
-            } else {
-                String lastUpdatedTime = (String) getRelativeTimeSpanString(updatedAtDate.getTime());
-                lastUpdatedTime = getString(R.string.string_last_updated) + " " + lastUpdatedTime + ".";
-                lastUpdatedTextView.setText(lastUpdatedTime);
-
-                List<Shelter> shelterQuery = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString());
-                Shelter shelter = shelterQuery.get(0);
-                mShelterName = shelter.getName();
-                getActivity().setTitle(getTitle());
-
-                for (DailyWeather dailyWeather : dailyWeatherQuery) {
-                    dailyWeathers.add(dailyWeather);
-                }
-
-                mAdapter = new DailyWeatherAdapter(dailyWeathers);
-                recyclerView.setAdapter(mAdapter);
             }
         } else {
             loadingBar.setVisibility(View.VISIBLE);
@@ -305,9 +307,12 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
                 loadingBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
 
-                lastUpdatedTextView.setText("Update failed.");
-
-                Toast.makeText(getContext(), "Sorry we could not load the weather for this shelter. Please try again.", Toast.LENGTH_SHORT).show();
+                if (dailyWeatherQuery.size() == 0) {
+                    getFragmentManager().popBackStack();
+                    Toast.makeText(getContext(), "Sorry, there was no offline data available and we could not load new data for this shelter.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Sorry we could not load the weather for this shelter. Please try again.", Toast.LENGTH_SHORT).show();
+                }
 
                 if(animationEnabled){
                     slideInAnimation();
