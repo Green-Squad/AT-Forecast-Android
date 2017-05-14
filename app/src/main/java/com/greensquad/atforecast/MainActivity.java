@@ -235,6 +235,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                     ).addToBackStack("shelter_detail_fragment").commit();
         } catch (NumberFormatException nfe) {
             Toast.makeText(getApplicationContext(), "You must enter a valid mile number.", Toast.LENGTH_LONG).show();
+        } catch (IndexOutOfBoundsException ioobe) {
+            Toast.makeText(getApplicationContext(), "Sorry. Could not get any data for the nearest shelter.", Toast.LENGTH_LONG).show();
         }
     }
 
