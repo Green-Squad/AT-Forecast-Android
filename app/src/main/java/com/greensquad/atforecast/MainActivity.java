@@ -60,6 +60,11 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
+        int nightMode = sharedPref.getInt("nightMode", defaultValue);
+        setNightMode(nightMode, false);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -72,11 +77,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         } else {
             syncDrawerToggleState();
         }
-
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
-        int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
-        int nightMode = sharedPref.getInt("nightMode", defaultValue);
-        setNightMode(nightMode, false);
 
         Log.d(LOG_TAG, "created");
     }
