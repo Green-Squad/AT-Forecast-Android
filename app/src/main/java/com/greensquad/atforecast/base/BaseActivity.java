@@ -8,43 +8,10 @@ import android.view.View;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    static final String LOG_TAG = BaseActivity.class.getSimpleName();
+    private static final String LOG_TAG = BaseActivity.class.getSimpleName();
 
     private FragmentManager fragmentManager;
     private AddFragmentHandler fragmentHandler;
-
-    final View.OnClickListener navigationBackPressListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            fragmentManager.popBackStack();
-        }
-    };
-
-    FragmentManager.OnBackStackChangedListener backStackListener = new FragmentManager.OnBackStackChangedListener() {
-        @Override
-        public void onBackStackChanged() {
-            onBackStackChangedEvent();
-        }
-    };
-
-    private void onBackStackChangedEvent() {
-        syncDrawerToggleState();
-    }
-
-    protected void syncDrawerToggleState() {
-        ActionBarDrawerToggle drawerToggle = getDrawerToggle();
-        if (drawerToggle == null) {
-            return;
-        }
-        if (fragmentManager.getBackStackEntryCount() > 1) {
-            drawerToggle.setDrawerIndicatorEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener);
-        } else {
-            drawerToggle.setDrawerIndicatorEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +56,39 @@ public abstract class BaseActivity extends AppCompatActivity {
         //close the activity if back is pressed on the root fragment
         if (fragmentManager.getBackStackEntryCount() == 0) {
             finish();
+        }
+    }
+
+    final View.OnClickListener navigationBackPressListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            fragmentManager.popBackStack();
+        }
+    };
+
+    FragmentManager.OnBackStackChangedListener backStackListener = new FragmentManager.OnBackStackChangedListener() {
+        @Override
+        public void onBackStackChanged() {
+            onBackStackChangedEvent();
+        }
+    };
+
+    private void onBackStackChangedEvent() {
+        syncDrawerToggleState();
+    }
+
+    protected void syncDrawerToggleState() {
+        ActionBarDrawerToggle drawerToggle = getDrawerToggle();
+        if (drawerToggle == null) {
+            return;
+        }
+        if (fragmentManager.getBackStackEntryCount() > 1) {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener);
+        } else {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
     }
 

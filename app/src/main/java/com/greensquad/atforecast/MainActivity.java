@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,7 +47,8 @@ import io.nlopez.smartlocation.location.config.LocationParams;
 
 public class MainActivity extends BaseActivity implements OnLocationUpdatedListener {
 
-    static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final int LOCATION_PERMISSION_ID = 1001;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar toolbar;
@@ -55,8 +57,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
     protected IrrLayout irr;
     protected DefaultRuleEngine engine;
-
-    private static final int LOCATION_PERMISSION_ID = 1001;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,14 +78,15 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         int nightMode = sharedPref.getInt("nightMode", defaultValue);
         setNightMode(nightMode, false);
 
-        DefaultRuleEngine.trackAppStart(this);
-        initialize();
+        Log.d(LOG_TAG, "created");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d(LOG_TAG, "started");
         DefaultRuleEngine.trackAppStart(this);
+        initializeRating();
     }
 
     @Override
@@ -159,6 +160,40 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == LOCATION_PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            findGPS();
+        } else {
+            Toast.makeText(getApplicationContext(), "Location is required to find nearest shelter.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onLocationUpdated(Location location) {
+        loadingBar.setVisibility(View.GONE);
+        List<Shelter> sheltersList = Shelter.findByNearestCoords(location.getLatitude(), location.getLongitude());
+        Gson gson = new Gson();
+        String shelterList = gson.toJson(sheltersList);
+        ShelterListFragment shelterListFragment = ShelterListFragment.newInstance("Nearest Shelters", shelterList);
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction().setCustomAnimations(
+                R.anim.fragment_slide_left_enter,
+                R.anim.fragment_slide_left_exit,
+                R.anim.fragment_slide_right_enter,
+                R.anim.fragment_slide_right_exit)
+                .replace(
+                        R.id.fragment_main,
+                        shelterListFragment,
+                        shelterListFragment.getTag()
+                ).addToBackStack("shelter_list_fragment").commit();
+    }
+
+    @Override
+    protected ActionBarDrawerToggle getDrawerToggle() {
+        return mDrawerToggle;
+    }
+
     private void setNightMode(@AppCompatDelegate.NightMode int nightMode, boolean setNew) {
         AppCompatDelegate.setDefaultNightMode(nightMode);
         if(setNew) {
@@ -203,35 +238,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == LOCATION_PERMISSION_ID && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            findGPS();
-        } else {
-            Toast.makeText(getApplicationContext(), "Location is required to find nearest shelter.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onLocationUpdated(Location location) {
-        loadingBar.setVisibility(View.GONE);
-        List<Shelter> sheltersList = Shelter.findByNearestCoords(location.getLatitude(), location.getLongitude());
-        Gson gson = new Gson();
-        String shelterList = gson.toJson(sheltersList);
-        ShelterListFragment shelterListFragment = ShelterListFragment.newInstance("Nearest Shelters", shelterList);
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction().setCustomAnimations(
-                R.anim.fragment_slide_left_enter,
-                R.anim.fragment_slide_left_exit,
-                R.anim.fragment_slide_right_enter,
-                R.anim.fragment_slide_right_exit)
-                .replace(
-                        R.id.fragment_main,
-                        shelterListFragment,
-                        shelterListFragment.getTag()
-                ).addToBackStack("shelter_list_fragment").commit();
-    }
-
    private void setupDrawerAndToggle() {
         setSupportActionBar(toolbar);
         mDrawerToggle = new ActionBarDrawerToggle(this, new DrawerLayout(this), toolbar, 0, 0);
@@ -242,12 +248,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         add(StateListFragment.newInstance());
     }
 
-    @Override
-    protected ActionBarDrawerToggle getDrawerToggle() {
-        return mDrawerToggle;
-    }
-
-    protected void initialize() {
+    protected void initializeRating() {
         irr = (IrrLayout) findViewById(R.id.irr_layout);
         engine = (DefaultRuleEngine) irr.getRuleEngine();
         engine.setListener(new DefaultRuleEngine.DefaultOnUserDecisionListener() {
@@ -305,6 +306,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             irr.setVisibility(View.GONE);
+                            irr.clearAnimation();
                         }
 
                         @Override

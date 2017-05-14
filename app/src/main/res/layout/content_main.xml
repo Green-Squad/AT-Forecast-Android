@@ -19,11 +19,11 @@
         xmlns:irr="http://schemas.android.com/apk/res-auto"
         android:visibility="gone"
         irr:autoEvaluateDefaultRuleEngine="true"
-        irr:defaultRuleAppStartCount="2"
-        irr:defaultRuleDismissMaxCount="3"
+        irr:defaultRuleAppStartCount="10"
+        irr:defaultRuleDistinctDays="5"
         irr:defaultRuleDismissPostponeDays="7"
-        irr:defaultRuleDistinctDays="1"
-        irr:feedbackUrl="https://www.atforecast.com"
+        irr:defaultRuleDismissMaxCount="3"
+        irr:feedbackUrl="@string/link_feedback"
         irr:ratingUrl="@string/link_store">
 
         <LinearLayout
