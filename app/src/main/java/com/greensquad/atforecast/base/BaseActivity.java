@@ -19,6 +19,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             fragmentManager.popBackStack();
         }
     };
+
     FragmentManager.OnBackStackChangedListener backStackListener = new FragmentManager.OnBackStackChangedListener() {
         @Override
         public void onBackStackChanged() {
@@ -38,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (fragmentManager.getBackStackEntryCount() > 1) {
             drawerToggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener); //pop backstack
+            drawerToggle.setToolbarNavigationClickListener(navigationBackPressListener);
         } else {
             drawerToggle.setDrawerIndicatorEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -48,6 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         fragmentManager = getSupportFragmentManager();
         fragmentHandler = new AddFragmentHandler(fragmentManager);
         fragmentManager.addOnBackStackChangedListener(backStackListener);

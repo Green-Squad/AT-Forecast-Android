@@ -38,4 +38,5 @@ dependencies {
     compile 'com.daimajia.easing:library:2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.2@aar'
     compile 'com.bartoszlipinski:recyclerviewheader2:2.0.1'
+    compile 'net.mediavrog:integrated-rating-request:1.1.2'
 }

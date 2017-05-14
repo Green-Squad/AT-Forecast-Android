@@ -11,4 +11,7 @@
     <string name="string_button_previous">Previous</string>
     <string name="string_last_updated">Last updated</string>
     <string name="string_last_updated_now">Last updated just now.</string>
+
+    // Rating
+    <string name="link_store" translatable="false">market://details?id=com.greensquad.atforecast</string>
 </resources>

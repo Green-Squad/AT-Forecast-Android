@@ -22,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -30,6 +32,10 @@ import com.greensquad.atforecast.fragments.ShelterDetailFragment;
 import com.greensquad.atforecast.fragments.ShelterListFragment;
 import com.greensquad.atforecast.fragments.StateListFragment;
 import com.greensquad.atforecast.models.Shelter;
+
+import net.mediavrog.irr.DefaultOnToggleVisibilityListener;
+import net.mediavrog.irr.DefaultRuleEngine;
+import net.mediavrog.irr.IrrLayout;
 
 import java.util.List;
 
@@ -47,8 +53,10 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private View loadingBar;
     private SharedPreferences sharedPref;
 
-    private static final int LOCATION_PERMISSION_ID = 1001;
+    protected IrrLayout irr;
+    protected DefaultRuleEngine engine;
 
+    private static final int LOCATION_PERMISSION_ID = 1001;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,12 +73,19 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             syncDrawerToggleState();
         }
 
-
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
         int nightMode = sharedPref.getInt("nightMode", defaultValue);
         setNightMode(nightMode, false);
 
+        DefaultRuleEngine.trackAppStart(this);
+        initialize();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        DefaultRuleEngine.trackAppStart(this);
     }
 
     @Override
@@ -230,6 +245,77 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     @Override
     protected ActionBarDrawerToggle getDrawerToggle() {
         return mDrawerToggle;
+    }
+
+    protected void initialize() {
+        irr = (IrrLayout) findViewById(R.id.irr_layout);
+        engine = (DefaultRuleEngine) irr.getRuleEngine();
+        engine.setListener(new DefaultRuleEngine.DefaultOnUserDecisionListener() {
+            @Override
+            public void onAccept(Context ctx, IrrLayout.State s) {
+                super.onAccept(ctx, s);
+            }
+
+            @Override
+            public void onDismiss(Context ctx, IrrLayout.State s) {
+                super.onDismiss(ctx, s);
+            }
+        });
+
+        irr.setOnToggleVisibilityListener(new DefaultOnToggleVisibilityListener() {
+
+            @Override
+            public void onShow(final IrrLayout irr) {
+                if (irr.getVisibility() != View.VISIBLE) {
+                    TranslateAnimation anim = new TranslateAnimation(0, 0, -300, 0);
+                    anim.setDuration(200);
+                    anim.setFillAfter(true);
+                    anim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            irr.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+                    irr.startAnimation(anim);
+                }
+            }
+
+            @Override
+            public void onHide(final IrrLayout irr) {
+                if (irr.getVisibility() != View.GONE) {
+                    TranslateAnimation anim = new TranslateAnimation(0, 0, 0, -300);
+                    anim.setDuration(150);
+                    anim.setFillAfter(true);
+                    anim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            irr.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+                    irr.startAnimation(anim);
+                }
+            }
+        });
     }
 
 }

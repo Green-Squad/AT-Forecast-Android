@@ -13,6 +13,90 @@
         android:layout_height="match_parent">
     </FrameLayout>
 
+    <net.mediavrog.irr.IrrLayout
+        android:id="@+id/irr_layout"
+        style="@style/Irr.SnackBar.Layout"
+        xmlns:irr="http://schemas.android.com/apk/res-auto"
+        android:visibility="gone"
+        irr:autoEvaluateDefaultRuleEngine="true"
+        irr:defaultRuleAppStartCount="2"
+        irr:defaultRuleDismissMaxCount="3"
+        irr:defaultRuleDismissPostponeDays="7"
+        irr:defaultRuleDistinctDays="1"
+        irr:feedbackUrl="https://www.atforecast.com"
+        irr:ratingUrl="@string/link_store">
+
+        <LinearLayout
+            android:id="@id/irr_nudge_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@id/irr_nudge_text"
+                style="@style/Irr.SnackBar.Text"
+                android:text="Enjoying our app?"/>
+
+            <TextView
+                android:id="@id/irr_nudge_accept_btn"
+                style="@style/Irr.SnackBar.Button"
+                android:text="VERY MUCH"/>
+
+            <Button
+                android:id="@id/irr_nudge_decline_btn"
+                style="@style/Irr.SnackBar.Button.Decline"
+                android:text="×"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@id/irr_rate_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:visibility="gone">
+
+            <TextView
+                android:id="@id/irr_rate_text"
+                style="@style/Irr.SnackBar.Text"
+                android:text="How about rating it?"/>
+
+            <TextView
+                android:id="@id/irr_rate_accept_btn"
+                style="@style/Irr.SnackBar.Button"
+                android:text="SURE"/>
+
+            <Button
+                android:id="@id/irr_rate_decline_btn"
+                style="@style/Irr.SnackBar.Button.Decline"
+                android:text="×"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@id/irr_feedback_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@id/irr_feedback_text"
+                style="@style/Irr.SnackBar.Text"
+                android:text="Got some feedback?"/>
+
+            <TextView
+                android:id="@id/irr_feedback_accept_btn"
+                style="@style/Irr.SnackBar.Button"
+                android:text="YES"/>
+
+            <Button
+                android:id="@id/irr_feedback_decline_btn"
+                style="@style/Irr.SnackBar.Button.Decline"
+                android:text="×"/>
+        </LinearLayout>
+
+    </net.mediavrog.irr.IrrLayout>
+
     <RelativeLayout
         android:id="@+id/loadingPanel"
         android:layout_width="match_parent"
