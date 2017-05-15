@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -78,13 +77,11 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             syncDrawerToggleState();
         }
 
-        Log.d(LOG_TAG, "created");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(LOG_TAG, "started");
         DefaultRuleEngine.trackAppStart(this);
         initializeRating();
     }
