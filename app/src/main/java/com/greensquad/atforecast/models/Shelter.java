@@ -133,21 +133,23 @@ public class Shelter extends SugarRecord {
     }
 
     public Shelter getPrevious() {
-        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage < ?", mileage.toString());
+        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").lt(mileage.toString())).orderBy("mileage").list();
+        Log.d(LOG_TAG, shelterList.toString());
+
         Shelter shelter = null;
         if (!shelterList.isEmpty()) {
             shelter = shelterList.get(shelterList.size() - 1);
         }
-        return  shelter;
+        return shelter;
     }
 
     public Shelter getNext() {
-        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage > ?", mileage.toString());
+        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").gt(mileage.toString())).orderBy("mileage").list();
         Shelter shelter = null;
         if (!shelterList.isEmpty()) {
             shelter = shelterList.get(0);
         }
-        return  shelter;
+        return shelter;
     }
 
     public static Shelter findByNearestMileage(double mileage) {
@@ -157,7 +159,7 @@ public class Shelter extends SugarRecord {
     }
 
     public List<Shelter> getPrevious(int number) {
-        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage < ?", mileage.toString());
+        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").lt(mileage.toString())).orderBy("mileage").list();
         List<Shelter> returnedList = new ArrayList<>();
         if (shelterList.size() <= number) {
             returnedList = shelterList;
@@ -168,7 +170,7 @@ public class Shelter extends SugarRecord {
     }
 
     public List<Shelter> getNext(int number) {
-        List<Shelter> shelterList = Shelter.find(Shelter.class, "mileage > ?", mileage.toString());
+        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").gt(mileage.toString())).orderBy("mileage").list();
         List<Shelter> returnedList = new ArrayList<>();
         if (shelterList.size() <= number) {
             returnedList = shelterList;
@@ -194,6 +196,10 @@ public class Shelter extends SugarRecord {
         double a = Math.pow(Math.sin(dLat / 2),2) + Math.pow(Math.sin(dLon / 2),2) * Math.cos(lat1) * Math.cos(lat2);
         double c = 2 * Math.asin(Math.sqrt(a));
         return R * c;
+    }
+
+    public String toString() {
+        return "Name: " + name + " | Mileage: " + mileage + "\n";
     }
 
 }
