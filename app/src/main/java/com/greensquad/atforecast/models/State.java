@@ -1,10 +1,12 @@
 package com.greensquad.atforecast.models;
 
+import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.greensquad.atforecast.Utils;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 import com.orm.dsl.Unique;
@@ -86,7 +88,7 @@ public class State extends SugarRecord implements Parcelable {
     }
 
     public Integer getAverageHigh() {
-        return averageHigh;
+        return Units.getUnitType() == 1 ? Utils.toCelsius(averageHigh) : averageHigh;
     }
 
     public void setAverageHigh(Integer averageHigh) {
@@ -94,7 +96,7 @@ public class State extends SugarRecord implements Parcelable {
     }
 
     public Integer getAverageLow() {
-        return averageLow;
+        return Units.getUnitType() == 1 ? Utils.toCelsius(averageLow) : averageLow;
     }
 
     public void setAverageLow(Integer averageLow) {

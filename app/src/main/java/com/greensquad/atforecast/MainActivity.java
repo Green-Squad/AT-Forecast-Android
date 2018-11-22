@@ -32,6 +32,7 @@ import com.greensquad.atforecast.fragments.ShelterDetailFragment;
 import com.greensquad.atforecast.fragments.ShelterListFragment;
 import com.greensquad.atforecast.fragments.StateListFragment;
 import com.greensquad.atforecast.models.Shelter;
+import com.greensquad.atforecast.models.Units;
 
 import net.mediavrog.irr.DefaultOnToggleVisibilityListener;
 import net.mediavrog.irr.DefaultRuleEngine;
@@ -55,6 +56,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private Toolbar toolbar;
     private View loadingBar;
     private SharedPreferences sharedPref;
+    private int storedUnitType;
 
     protected IrrLayout irr;
     protected DefaultRuleEngine engine;
@@ -134,8 +136,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                 break;
         }
 
-        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-        int storedUnitType = prefs.getInt("unitType", 0);
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        storedUnitType = sharedPref.getInt("unitType", 0);
 
         switch (storedUnitType) {
             case UNIT_TYPE_F:
@@ -226,6 +228,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     }
 
     private void setUnitType(int unitType, boolean setNew) {
+        Units.setUnitType(unitType);
         if(setNew) {
             sharedPref = getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
