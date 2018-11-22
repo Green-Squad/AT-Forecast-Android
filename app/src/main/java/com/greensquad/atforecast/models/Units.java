@@ -6,7 +6,7 @@ public class Units {
 
     public Units() {}
 
-    public static int getUnitType() {
+    static int getUnitType() {
         return unitType;
     }
 

@@ -3,6 +3,7 @@ package com.greensquad.atforecast.fragments;
 
 import android.animation.Animator;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatButton;
@@ -78,22 +79,22 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
         setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
-        constraintLayout = (ConstraintLayout) view.findViewById(R.id.shelter_constraint_layout);
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
-        recyclerView = (RecyclerView) view.findViewById(R.id.shelter_recycler_view);
-        lastUpdatedTextView = (TextView) view.findViewById(R.id.text_last_updated);
+        constraintLayout = view.findViewById(R.id.shelter_constraint_layout);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        recyclerView = view.findViewById(R.id.shelter_recycler_view);
+        lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
-        RecyclerViewHeader recyclerHeader = (RecyclerViewHeader) view.findViewById(R.id.shelter_recycler_header);
-        AppCompatButton previousButton = (AppCompatButton) view.findViewById(R.id.previous_button);
-        AppCompatButton nextButton = (AppCompatButton) view.findViewById(R.id.next_button);
+        RecyclerViewHeader recyclerHeader = view.findViewById(R.id.shelter_recycler_header);
+        AppCompatButton previousButton = view.findViewById(R.id.previous_button);
+        AppCompatButton nextButton = view.findViewById(R.id.next_button);
 
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

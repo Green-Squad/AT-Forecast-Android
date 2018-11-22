@@ -1,6 +1,7 @@
 package com.greensquad.atforecast.adapters;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -22,12 +23,12 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
-        public TextView mileage;
+        TextView mileage;
 
-        public ViewHolder(View v) {
+        ViewHolder(View v) {
             super(v);
-            name = (TextView) v.findViewById(R.id.shelters_shelter_name);
-            mileage = (TextView) v.findViewById(R.id.shelters_shelter_mileage);
+            name = v.findViewById(R.id.shelters_shelter_name);
+            mileage = v.findViewById(R.id.shelters_shelter_mileage);
         }
     }
 
@@ -45,15 +46,16 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
         mShelters = shelters;
     }
 
+    @NonNull
     @Override
-    public SheltersAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SheltersAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_shelter, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Shelter shelter = mShelters.get(position);
         final String shelterName = shelter.getName();
         final String shelterMileage = shelter.getMileage().toString();
@@ -82,8 +84,6 @@ public class SheltersAdapter extends RecyclerView.Adapter<SheltersAdapter.ViewHo
                                 ).addToBackStack("shelter_detail_fragment").commit();
                     }
                 }, 50);
-
-
             }
         });
     }

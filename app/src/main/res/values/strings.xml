@@ -1,19 +1,27 @@
 <resources>
     <string name="app_name">AT Forecast</string>
     <string name="action_settings">Settings</string>
+
     <string name="menu_night_mode">Night mode</string>
     <string name="menu_night_mode_day">Day (always)</string>
     <string name="menu_night_mode_night">Night (always)</string>
     <string name="menu_night_mode_auto">Auto</string>
+
     <string name="menu_units">Change Units</string>
     <string name="menu_units_fahrenheit">Fahrenheit</string>
     <string name="menu_units_celsius">Celsius</string>
+
     <string name="menu_gps">Find by location</string>
     <string name="menu_search">Search by mileage</string>
+
     <string name="string_button_next">Next</string>
     <string name="string_button_previous">Previous</string>
+
     <string name="string_last_updated">Last updated</string>
     <string name="string_last_updated_now">Last updated just now.</string>
+
+    <string name="state_average_temps">State average: %1$d° / %2$d°</string>
+    <string name="daily_weather_temps">%1$d° / %2$d°</string>
 
     // Rating
     <string name="link_store" translatable="false">market://details?id=com.greensquad.atforecast</string>

@@ -13,7 +13,7 @@ import com.greensquad.atforecast.R;
 public class AddFragmentHandler {
     private final FragmentManager fragmentManager;
 
-    public AddFragmentHandler(FragmentManager fragmentManager) {
+    AddFragmentHandler(FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
     }
 
@@ -34,7 +34,7 @@ public class AddFragmentHandler {
     }
 
     @Nullable
-    public BaseFragment getCurrentFragment() {
+    BaseFragment getCurrentFragment() {
         if (fragmentManager.getBackStackEntryCount() == 0) {
             return null;
         }

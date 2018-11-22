@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Shelter extends SugarRecord {
 
-    static final String LOG_TAG = Shelter.class.getSimpleName();
+    private static final String LOG_TAG = Shelter.class.getSimpleName();
 
     @SerializedName("shelter_id")
     @Expose

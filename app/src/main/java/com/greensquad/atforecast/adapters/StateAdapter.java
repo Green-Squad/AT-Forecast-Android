@@ -1,6 +1,7 @@
 package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -27,11 +28,11 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         public TextView temps;
         public ImageView icon;
 
-        public ViewHolder(View v) {
+        ViewHolder(View v) {
             super(v);
-            name = (TextView) v.findViewById(R.id.state_name);
-            temps = (TextView) v.findViewById(R.id.state_avg_temps);
-            icon = (ImageView) v.findViewById(R.id.state_icon);
+            name = v.findViewById(R.id.state_name);
+            temps = v.findViewById(R.id.state_avg_temps);
+            icon = v.findViewById(R.id.state_icon);
         }
     }
 
@@ -55,8 +56,9 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
         mStates = states;
     }
 
+    @NonNull
     @Override
-    public StateAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StateAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_state, parent, false);
         context = parent.getContext();
@@ -64,7 +66,7 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final State state = mStates.get(position);
         final String stateName = state.getName();
 
@@ -72,7 +74,8 @@ public class StateAdapter extends RecyclerView.Adapter<StateAdapter.ViewHolder> 
 
         holder.icon.setImageResource(imgId);
         holder.name.setText(stateName);
-        holder.temps.setText("State average: " + state.getAverageHigh() + "° / " + state.getAverageLow()+ "°");
+        holder.temps.setText(context.getString(R.string.state_average_temps,
+                state.getAverageHigh(), state.getAverageLow()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

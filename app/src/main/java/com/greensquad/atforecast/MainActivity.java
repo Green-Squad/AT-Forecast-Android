@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDelegate;
@@ -56,7 +55,6 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     private Toolbar toolbar;
     private View loadingBar;
     private SharedPreferences sharedPref;
-    private int storedUnitType;
 
     protected IrrLayout irr;
     protected DefaultRuleEngine engine;
@@ -73,7 +71,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         loadingBar = findViewById(R.id.loadingPanel);
 
         setupDrawerAndToggle();
@@ -94,11 +92,11 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final Menu fMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.search));
+        final MenuItem search = menu.findItem(R.id.search);
+        final SearchView searchView = (SearchView) search.getActionView();
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
@@ -109,7 +107,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             public boolean onQueryTextSubmit(String query) {
                 searchByMileage(query);
                 searchView.setIconified(true);
-                MenuItemCompat.collapseActionView(fMenu.findItem(R.id.search));
+                search.collapseActionView();
                 return true;
             }
 
@@ -137,7 +135,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         }
 
         sharedPref = getPreferences(Context.MODE_PRIVATE);
-        storedUnitType = sharedPref.getInt("unitType", 0);
+        int storedUnitType = sharedPref.getInt("unitType", 0);
 
         switch (storedUnitType) {
             case UNIT_TYPE_F:
@@ -284,7 +282,7 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     }
 
     protected void initializeRating() {
-        irr = (IrrLayout) findViewById(R.id.irr_layout);
+        irr = findViewById(R.id.irr_layout);
         engine = (DefaultRuleEngine) irr.getRuleEngine();
         engine.setListener(new DefaultRuleEngine.DefaultOnUserDecisionListener() {
             @Override

@@ -2,6 +2,7 @@ package com.greensquad.atforecast.fragments;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,11 +51,11 @@ public class ShelterListFragment extends BaseFragment implements BackButtonSuppo
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shelter_list, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.shelters_recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.shelters_recycler_view);
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

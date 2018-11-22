@@ -13,8 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIController implements Callback<Shelter> {
 
-    static final String BASE_URL = "https://www.atforecast.com/";
-    static final String LOG_TAG = "APIController";
+    private static final String BASE_URL = "https://www.atforecast.com/";
+    private static final String LOG_TAG = "APIController";
 
     private static Retrofit retrofit = null;
 

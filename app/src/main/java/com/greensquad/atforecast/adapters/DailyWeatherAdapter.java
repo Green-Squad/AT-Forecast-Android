@@ -2,6 +2,7 @@ package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -33,22 +34,22 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     private Context context;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
+        //Each data item is just a string in this case
         public TextView date;
         public TextView condition;
         public TextView temps;
-        public RecyclerView hourlyWeathers;
-        public TableLayout hourlyWeatherTable;
-        public ImageView weatherImage;
+        RecyclerView hourlyWeathers;
+        TableLayout hourlyWeatherTable;
+        ImageView weatherImage;
 
-        public ViewHolder(View v) {
+        ViewHolder(View v) {
             super(v);
-            date = (TextView) v.findViewById(R.id.date);
-            condition = (TextView) v.findViewById(R.id.condition);
-            temps = (TextView) v.findViewById(R.id.temps);
-            hourlyWeathers = (RecyclerView) v.findViewById(R.id.hourly_weather_recycler_view);
-            hourlyWeatherTable = (TableLayout) v.findViewById(R.id.hourly_weather_table_layout);
-            weatherImage = (ImageView) v.findViewById(R.id.weather_img);
+            date = v.findViewById(R.id.date);
+            condition = v.findViewById(R.id.condition);
+            temps = v.findViewById(R.id.temps);
+            hourlyWeathers = v.findViewById(R.id.hourly_weather_recycler_view);
+            hourlyWeatherTable = v.findViewById(R.id.hourly_weather_table_layout);
+            weatherImage = v.findViewById(R.id.weather_img);
         }
     }
 
@@ -66,8 +67,9 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         mDailyWeathers = myDailyWeathers;
     }
 
+    @NonNull
     @Override
-    public DailyWeatherAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DailyWeatherAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_forecast, parent, false);
         mParent = parent;
@@ -76,7 +78,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DailyWeather dw = mDailyWeathers.get(position);
         String weatherDate = dw.getWeatherDate();
         Date parsedDate;
@@ -120,7 +122,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         holder.weatherImage.setImageResource(imgId);
         holder.date.setText(formattedDate);
         holder.condition.setText(dw.getDescription());
-        holder.temps.setText(dw.getHigh() + "° / " + dw.getLow() + "°");
+        holder.temps.setText(context.getString(R.string.daily_weather_temps, dw.getHigh(), dw.getLow()));
         holder.hourlyWeathers.setHasFixedSize(true);
 
         ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(dw.getHourlyWeatherFromDb());

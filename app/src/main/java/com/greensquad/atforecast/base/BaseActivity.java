@@ -104,8 +104,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (!(fragmentOnTop instanceof BackButtonSupportFragment)) {
             return false;
         }
-        boolean consumedBackPress = ((BackButtonSupportFragment) fragmentOnTop).onBackPressed();
-        return consumedBackPress;
+        return ((BackButtonSupportFragment) fragmentOnTop).onBackPressed();
     }
 
     protected abstract ActionBarDrawerToggle getDrawerToggle();

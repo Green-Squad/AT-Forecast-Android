@@ -1,6 +1,5 @@
 package com.greensquad.atforecast.models;
 
-import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 

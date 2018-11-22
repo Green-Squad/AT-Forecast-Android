@@ -3,6 +3,7 @@ package com.greensquad.atforecast.fragments;
 
 import android.animation.Animator;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -52,12 +53,12 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_state_list, container, false);
 
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
-        recyclerView = (RecyclerView) view.findViewById(R.id.main_recycler_view);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        recyclerView = view.findViewById(R.id.main_recycler_view);
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
@@ -94,7 +95,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         recyclerView.addItemDecoration(itemDecoration);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        mLayoutManager.setAutoMeasureEnabled(false);
         recyclerView.setLayoutManager(mLayoutManager);
 
         List<State> dbStates = State.listAll(State.class);
