@@ -48,6 +48,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int LOCATION_PERMISSION_ID = 1001;
+    private static final int UNIT_TYPE_F = 0;
+    private static final int UNIT_TYPE_C = 1;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar toolbar;
@@ -62,7 +64,9 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         int defaultValue = AppCompatDelegate.MODE_NIGHT_NO;
         int nightMode = sharedPref.getInt("nightMode", defaultValue);
+        int unitType = sharedPref.getInt("unitType", 0);
         setNightMode(nightMode, false);
+        setUnitType(unitType, false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -129,6 +133,19 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                 menu.findItem(R.id.menu_night_mode_day).setChecked(true);
                 break;
         }
+
+        SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+        int storedUnitType = prefs.getInt("unitType", 0);
+
+        switch (storedUnitType) {
+            case UNIT_TYPE_F:
+                menu.findItem(R.id.menu_units_fahrenheit).setChecked(true);
+                break;
+            case UNIT_TYPE_C:
+                menu.findItem(R.id.menu_units_celsius).setChecked(true);
+                break;
+        }
+
         return true;
     }
 
@@ -151,6 +168,12 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
                 break;
             case R.id.menu_night_mode_auto:
                 setNightMode(AppCompatDelegate.MODE_NIGHT_AUTO, true);
+                break;
+            case R.id.menu_units_fahrenheit:
+                setUnitType(UNIT_TYPE_F, true);
+                break;
+            case R.id.menu_units_celsius:
+                setUnitType(UNIT_TYPE_C, true);
                 break;
         }
 
@@ -197,6 +220,16 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             sharedPref = getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putInt("nightMode", nightMode);
+            editor.apply();
+            recreate();
+        }
+    }
+
+    private void setUnitType(int unitType, boolean setNew) {
+        if(setNew) {
+            sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("unitType", unitType);
             editor.apply();
             recreate();
         }

@@ -5,6 +5,9 @@
     <string name="menu_night_mode_day">Day (always)</string>
     <string name="menu_night_mode_night">Night (always)</string>
     <string name="menu_night_mode_auto">Auto</string>
+    <string name="menu_units">Toggle Units</string>
+    <string name="menu_units_fahrenheit">Fahrenheit</string>
+    <string name="menu_units_celsius">Celsius</string>
     <string name="menu_gps">Find by location</string>
     <string name="menu_search">Search by mileage</string>
     <string name="string_button_next">Next</string>
