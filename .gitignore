@@ -9,3 +9,7 @@
 .externalNativeBuild
 /app/src/main/res/values/keys.xml
 /app/app-release.apk
+.idea/caches/build_file_checksums.ser
+.idea/codeStyles/Project.xml
+app/release/app-release.apk
+app/release/output.json
