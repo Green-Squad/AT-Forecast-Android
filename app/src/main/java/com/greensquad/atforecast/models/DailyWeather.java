@@ -2,6 +2,7 @@ package com.greensquad.atforecast.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.greensquad.atforecast.Utils;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -64,7 +65,7 @@ public class DailyWeather extends SugarRecord {
     }
 
     public Integer getHigh() {
-        return high;
+        return Units.getUnitType() == 1 ? Utils.toCelsius(high) : high;
     }
 
     public void setHigh(Integer high) {
@@ -72,7 +73,7 @@ public class DailyWeather extends SugarRecord {
     }
 
     public Integer getLow() {
-        return low;
+        return Units.getUnitType() == 1 ? Utils.toCelsius(low) : low;
     }
 
     public void setLow(Integer low) {

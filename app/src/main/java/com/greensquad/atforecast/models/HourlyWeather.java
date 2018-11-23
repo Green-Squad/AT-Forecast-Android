@@ -2,6 +2,7 @@ package com.greensquad.atforecast.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.greensquad.atforecast.Utils;
 import com.orm.SugarRecord;
 
 public class HourlyWeather extends SugarRecord {
@@ -48,7 +49,7 @@ public class HourlyWeather extends SugarRecord {
     }
 
     public Integer getTemp() {
-        return temp;
+        return Units.getUnitType() == 1 ? Utils.toCelsius(temp) : temp;
     }
 
     public void setTemp(Integer temp) {
