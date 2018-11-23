@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,12 +18,14 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -105,10 +108,24 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchByMileage(query);
-                searchView.setIconified(true);
-                search.collapseActionView();
-                return true;
+                if(Double.parseDouble(query) <= 2500) {
+                    searchByMileage(query);
+                    searchView.setIconified(true);
+                    search.collapseActionView();
+                    return true;
+                }
+
+                Toast toast = Toast.makeText(MainActivity.this, "Maximum: 2500", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP, 0, 200);
+
+                View toastView = toast.getView();
+                toastView.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+                TextView text = toastView.findViewById(android.R.id.message);
+                text.setTextColor(getResources().getColor(R.color.white));
+
+                toast.show();
+
+                return false;
             }
 
             @Override
