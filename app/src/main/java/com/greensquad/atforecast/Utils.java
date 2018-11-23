@@ -4,7 +4,7 @@ public final class Utils {
     private Utils() {}
 
     public static int toCelsius(int temp){
-        return ((temp - 32) * 5) / 9;
-
+        double newTemp = ((temp - 32) * 5.0) / 9.0;
+        return (int) Math.round(newTemp);
     }
 }
