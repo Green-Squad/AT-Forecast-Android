@@ -102,7 +102,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         RecyclerView.Adapter mAdapter = new StateAdapter(new ArrayList<>(dbStates));
         recyclerView.setAdapter(mAdapter);
 
-        if (dbStates.isEmpty()) {
+        if (dbStates.isEmpty() || Shelter.listAll(Shelter.class).get(0).getElevation() == null) {
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
             Call<List<State>> call = apiService.getStates(true, getString(R.string.atforecast_api_key));
 

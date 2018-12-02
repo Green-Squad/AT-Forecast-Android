@@ -199,7 +199,7 @@ public class Shelter extends SugarRecord {
     }
 
     public String toString() {
-        return "Name: " + name + " | Mileage: " + mileage + "\n";
+        return "Name: " + name + " | Mileage: " + mileage + " | Elevation: " + elevation + "\n";
     }
 
 }

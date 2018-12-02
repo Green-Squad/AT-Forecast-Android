@@ -9,7 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,6 +53,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private View loadingBar;
     private SwipeRefreshLayout swipeContainer;
     private TextView lastUpdatedTextView;
+    private TextView mileageTextView;
+    private TextView elevationTextView;
 
     private Shelter mShelter;
     private Integer mShelterId;
@@ -81,7 +82,6 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-
         setHasOptionsMenu(true);
 
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
@@ -90,6 +90,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         swipeContainer = view.findViewById(R.id.swipeContainer);
         recyclerView = view.findViewById(R.id.shelter_recycler_view);
         lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
+        elevationTextView = view.findViewById(R.id.text_elevation);
+        mileageTextView = view.findViewById(R.id.text_mileage);
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         RecyclerViewHeader recyclerHeader = view.findViewById(R.id.shelter_recycler_header);
@@ -128,6 +130,18 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         recyclerView.setLayoutManager(mLayoutManager);
 
         mShelter = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString()).get(0);
+
+        if(mShelter.getMileage() != null) {
+            mileageTextView.setText(getString(R.string.mileage_text, mShelter.getMileage().toString()));
+        } else {
+            mileageTextView.setText(getString(R.string.mileage_placeholder_text));
+        }
+        if(mShelter.getElevation() != null) {
+            elevationTextView.setText(getString(R.string.elevation_text, mShelter.getElevation().toString()));
+        } else {
+            elevationTextView.setText(getString(R.string.elevation_placeholder_text));
+        }
+
         final Shelter previousShelter = mShelter.getPrevious();
         final Shelter nextShelter = mShelter.getNext();
 
