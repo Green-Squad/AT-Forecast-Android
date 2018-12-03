@@ -24,7 +24,7 @@
     <string name="daily_weather_temps">%1$d° / %2$d°</string>
 
     <string name="mileage_text">Mile: %1$s</string>
-    <string name="elevation_text">Elevation: %1$s</string>
+    <string name="elevation_text">Elevation: %1$s ft</string>
 
     <string name="mileage_placeholder_text">Mile: Refresh to update</string>
     <string name="elevation_placeholder_text">Elevation: Refresh to update</string>
