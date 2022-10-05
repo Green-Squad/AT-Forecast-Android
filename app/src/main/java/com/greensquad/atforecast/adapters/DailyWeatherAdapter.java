@@ -2,9 +2,9 @@ package com.greensquad.atforecast.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import static android.support.v4.content.ContextCompat.getColor;
+import static androidx.core.content.ContextCompat.getColor;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> {
     static final String LOG_TAG = DailyWeatherAdapter.class.getSimpleName();
