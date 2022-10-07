@@ -24,8 +24,8 @@
                     android:id="@+id/menu_night_mode_night"
                     android:title="@string/menu_night_mode_night" />
                 <item
-                    android:id="@+id/menu_night_mode_auto"
-                    android:title="@string/menu_night_mode_auto" />
+                    android:id="@+id/menu_night_mode_follow"
+                    android:title="@string/menu_night_mode_follow" />
             </group>
         </menu>
     </item>

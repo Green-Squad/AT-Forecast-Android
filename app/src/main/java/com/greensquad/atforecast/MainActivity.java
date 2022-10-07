@@ -140,8 +140,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         switch (AppCompatDelegate.getDefaultNightMode()) {
-            case AppCompatDelegate.MODE_NIGHT_AUTO:
-                menu.findItem(R.id.menu_night_mode_auto).setChecked(true);
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                menu.findItem(R.id.menu_night_mode_follow).setChecked(true);
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
                 menu.findItem(R.id.menu_night_mode_night).setChecked(true);
@@ -183,8 +183,8 @@ public class MainActivity extends BaseActivity implements OnLocationUpdatedListe
             case R.id.menu_night_mode_night:
                 setNightMode(AppCompatDelegate.MODE_NIGHT_YES, true);
                 break;
-            case R.id.menu_night_mode_auto:
-                setNightMode(AppCompatDelegate.MODE_NIGHT_AUTO, true);
+            case R.id.menu_night_mode_follow:
+                setNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM, true);
                 break;
             case R.id.menu_units_fahrenheit:
                 setUnitType(UNIT_TYPE_F, true);

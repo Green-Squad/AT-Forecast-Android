@@ -57,6 +57,25 @@
                     android:layout_toEndOf="@id/temps"
                     android:textSize="12sp" />
 
+                <TextView
+                    android:id="@+id/sunrise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_below="@id/temps"
+                    android:layout_marginEnd="12dp"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/sunset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_below="@id/temps"
+                    android:layout_toEndOf="@id/sunrise"
+                    android:layout_marginEnd="12dp"
+                    android:textSize="12sp" />
+
             </RelativeLayout>
 
             <RelativeLayout

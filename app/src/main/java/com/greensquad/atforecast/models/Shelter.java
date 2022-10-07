@@ -13,6 +13,7 @@ import com.orm.query.Select;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Shelter extends SugarRecord {
 
@@ -50,11 +51,13 @@ public class Shelter extends SugarRecord {
 
     private int stateId;
 
-    public Shelter() {}
+    public Shelter() {
+    }
 
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -62,19 +65,31 @@ public class Shelter extends SugarRecord {
     public Integer getShelterId() {
         return shelterId;
     }
+
     public void setShelterId(Integer shelterId) {
         this.shelterId = shelterId;
     }
 
-    public Double getMileage() { return mileage; }
-    public void setMileage(Double mileage) { this.mileage = mileage; }
+    public Double getMileage() {
+        return mileage;
+    }
 
-    public Integer getElevation() { return elevation; }
-    public void setElevation(Integer elevation) { this.elevation = elevation; }
+    public void setMileage(Double mileage) {
+        this.mileage = mileage;
+    }
+
+    public Integer getElevation() {
+        return elevation;
+    }
+
+    public void setElevation(Integer elevation) {
+        this.elevation = elevation;
+    }
 
     public List<DailyWeather> getDailyWeather() {
         return dailyWeather;
     }
+
     public void setDailyWeather(List<DailyWeather> dailyWeather) {
         this.dailyWeather = dailyWeather;
     }
@@ -111,73 +126,59 @@ public class Shelter extends SugarRecord {
         double smallestDistance = Double.MAX_VALUE;
         Shelter smallestShelter = null;
 
-        List<Shelter> shelters = Shelter.listAll(Shelter.class);
+        List<Shelter> shelters = Select.from(Shelter.class).orderBy("mileage").list();
         for (Shelter shelter : shelters) {
             double distance = haversine(
                     new double[]{latitude, longitude},
                     new double[]{shelter.getLatitude(), shelter.getLongitude()}
             );
 
-            if(distance < smallestDistance) {
+            if (distance < smallestDistance) {
                 smallestDistance = distance;
                 smallestShelter = shelter;
             }
         }
-        List<Shelter> sheltersList= new ArrayList<Shelter>();
 
-        sheltersList.addAll(smallestShelter.getPrevious(2));
+        List<Shelter> sheltersList = new ArrayList<>();
+        Double smallestMileage = smallestShelter.getMileage();
+
+        List<Shelter> previousShelters = shelters.stream()
+                .filter(shelter -> shelter.mileage < smallestMileage)
+                .collect(Collectors.toList());
+        previousShelters = previousShelters.subList(previousShelters.size() - Math.min(previousShelters.size(), 2), previousShelters.size());
+
+        List<Shelter> nextShelters = shelters.stream()
+                .filter(shelter -> shelter.mileage > smallestMileage)
+                .collect(Collectors.toList());
+
+        if (nextShelters.size() > 0){
+            nextShelters = nextShelters.subList(0, Math.min(nextShelters.size(), 2));
+        }
+
+        sheltersList.addAll(previousShelters);
         sheltersList.add(smallestShelter);
-        sheltersList.addAll(smallestShelter.getNext(2));
+        sheltersList.addAll(nextShelters);
 
         return sheltersList;
     }
 
     public Shelter getPrevious() {
-        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").lt(mileage.toString())).orderBy("mileage").list();
-        Log.d(LOG_TAG, shelterList.toString());
-
-        Shelter shelter = null;
-        if (!shelterList.isEmpty()) {
-            shelter = shelterList.get(shelterList.size() - 1);
-        }
-        return shelter;
+        return Select.from(Shelter.class)
+                .where(Condition.prop("mileage").lt(mileage.toString()))
+                .orderBy("mileage DESC")
+                .first();
     }
 
     public Shelter getNext() {
-        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").gt(mileage.toString())).orderBy("mileage").list();
-        Shelter shelter = null;
-        if (!shelterList.isEmpty()) {
-            shelter = shelterList.get(0);
-        }
-        return shelter;
+        return Select.from(Shelter.class)
+                .where(Condition.prop("mileage").gt(mileage.toString()))
+                .orderBy("mileage")
+                .first();
     }
 
     public static Shelter findByNearestMileage(double mileage) {
         List<Shelter> shelters = Select.from(Shelter.class).orderBy("ABS(" + mileage + "- mileage)").list();
         return shelters.get(0);
-
-    }
-
-    public List<Shelter> getPrevious(int number) {
-        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").lt(mileage.toString())).orderBy("mileage").list();
-        List<Shelter> returnedList = new ArrayList<>();
-        if (shelterList.size() <= number) {
-            returnedList = shelterList;
-        } else {
-            returnedList.addAll(shelterList.subList(shelterList.size() - number, shelterList.size()));
-        }
-        return returnedList;
-    }
-
-    public List<Shelter> getNext(int number) {
-        List<Shelter> shelterList = Select.from(Shelter.class).where(Condition.prop("mileage").gt(mileage.toString())).orderBy("mileage").list();
-        List<Shelter> returnedList = new ArrayList<>();
-        if (shelterList.size() <= number) {
-            returnedList = shelterList;
-        } else {
-            returnedList.addAll(shelterList.subList(0, number));
-        }
-        return returnedList;
     }
 
     // Use Latitude and Longitude coordinates
@@ -193,7 +194,7 @@ public class Shelter extends SugarRecord {
         lat1 = Math.toRadians(lat1);
         lat2 = Math.toRadians(lat2);
 
-        double a = Math.pow(Math.sin(dLat / 2),2) + Math.pow(Math.sin(dLon / 2),2) * Math.cos(lat1) * Math.cos(lat2);
+        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
         double c = 2 * Math.asin(Math.sqrt(a));
         return R * c;
     }
@@ -201,5 +202,4 @@ public class Shelter extends SugarRecord {
     public String toString() {
         return "Name: " + name + " | Mileage: " + mileage + " | Elevation: " + elevation + "\n";
     }
-
 }

@@ -18,9 +18,15 @@ import android.widget.TextView;
 import com.greensquad.atforecast.R;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.HourlyWeather;
+import com.greensquad.atforecast.models.Shelter;
+
+import org.shredzone.commons.suncalc.SunTimes;
+import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
@@ -29,6 +35,7 @@ import static androidx.core.content.ContextCompat.getColor;
 
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> {
     static final String LOG_TAG = DailyWeatherAdapter.class.getSimpleName();
+    private Shelter mShelter;
     private ArrayList<DailyWeather> mDailyWeathers;
     private ViewGroup mParent;
     private Context context;
@@ -38,6 +45,9 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         public TextView date;
         public TextView condition;
         public TextView temps;
+        public TextView sunrise;
+        public TextView sunset;
+
         RecyclerView hourlyWeathers;
         TableLayout hourlyWeatherTable;
         ImageView weatherImage;
@@ -50,6 +60,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
             hourlyWeathers = v.findViewById(R.id.hourly_weather_recycler_view);
             hourlyWeatherTable = v.findViewById(R.id.hourly_weather_table_layout);
             weatherImage = v.findViewById(R.id.weather_img);
+            sunrise = v.findViewById(R.id.sunrise);
+            sunset = v.findViewById(R.id.sunset);
         }
     }
 
@@ -63,8 +75,9 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         notifyItemRemoved(position);
     }
 
-    public DailyWeatherAdapter(ArrayList<DailyWeather> myDailyWeathers) {
+    public DailyWeatherAdapter(Shelter shelter, ArrayList<DailyWeather> myDailyWeathers) {
         mDailyWeathers = myDailyWeathers;
+        mShelter = shelter;
     }
 
     @NonNull
@@ -81,7 +94,7 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DailyWeather dw = mDailyWeathers.get(position);
         String weatherDate = dw.getWeatherDate();
-        Date parsedDate;
+        Date parsedDate = null;
         String formattedDate;
         try {
             parsedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US).parse(weatherDate);
@@ -124,6 +137,17 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         holder.condition.setText(dw.getDescription());
         holder.temps.setText(context.getString(R.string.daily_weather_temps, dw.getHigh(), dw.getLow()));
         holder.hourlyWeathers.setHasFixedSize(true);
+
+        SunTimes times = SunTimes.compute()
+                .on(parsedDate)
+                .at(mShelter.getLatitude(), mShelter.getLongitude())
+                .execute();
+
+        String formattedSunrise = DateTimeFormatter.ofPattern("h:mm a").format(times.getRise());
+        String formattedSunset = DateTimeFormatter.ofPattern("h:mm a").format(times.getSet());
+
+        holder.sunrise.setText(String.format("Sunrise: %s", formattedSunrise));
+        holder.sunset.setText(String.format("Sunset: %s", formattedSunset));
 
         ArrayList<HourlyWeather> hourlyWeatherArrayList = new ArrayList<>(dw.getHourlyWeatherFromDb());
 

@@ -1,25 +1,28 @@
 package com.greensquad.atforecast.fragments;
 
 
-import android.animation.Animator;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.R;
@@ -29,11 +32,18 @@ import com.greensquad.atforecast.base.BaseFragment;
 import com.greensquad.atforecast.models.DailyWeather;
 import com.greensquad.atforecast.models.HourlyWeather;
 import com.greensquad.atforecast.models.Shelter;
+import com.orm.query.Condition;
+import com.orm.query.Select;
+
+import org.shredzone.commons.suncalc.SunTimes;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,6 +57,8 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private static final Integer DIST_MILES = 100;
     private static final int ANIM_DURATION = 300;
     private static final int MINUTES_UNTIL_REFRESH = 2 * 60;
+    private static ATForecastAPI apiService;
+    private static ExecutorService executor;
 
     private ConstraintLayout constraintLayout;
     private RecyclerView recyclerView;
@@ -61,13 +73,15 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
     private String mShelterName;
     private List<DailyWeather> dailyWeatherQuery;
 
-    public ShelterDetailFragment() {}
+    public ShelterDetailFragment() {
+    }
 
     public static ShelterDetailFragment newInstance(Integer shelterId) {
         ShelterDetailFragment fragment = new ShelterDetailFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SHELTER_ID, shelterId);
         fragment.setArguments(args);
+        executor = Executors.newSingleThreadExecutor();
         return fragment;
     }
 
@@ -86,57 +100,40 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
 
         View view = inflater.inflate(R.layout.fragment_shelter, container, false);
 
+        apiService = APIController.getClient().create(ATForecastAPI.class);
+
         constraintLayout = view.findViewById(R.id.shelter_constraint_layout);
         swipeContainer = view.findViewById(R.id.swipeContainer);
         recyclerView = view.findViewById(R.id.shelter_recycler_view);
         lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
-        elevationTextView = view.findViewById(R.id.text_elevation);
         mileageTextView = view.findViewById(R.id.text_mileage);
+        elevationTextView = view.findViewById(R.id.text_elevation);
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         RecyclerViewHeader recyclerHeader = view.findViewById(R.id.shelter_recycler_header);
         AppCompatButton previousButton = view.findViewById(R.id.previous_button);
         AppCompatButton nextButton = view.findViewById(R.id.next_button);
 
+        if (mShelter == null) {
+            mShelter = Select.from(Shelter.class)
+                    .where(Condition.prop("shelter_id").eq(mShelterId))
+                    .first();
+        }
+
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                YoYo.with(Techniques.SlideOutRight)
-                        .duration(ANIM_DURATION)
-                        .repeat(1)
-                        .withListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {}
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                refresh(true);
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {}
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {}
-                        })
-                        .playOn(constraintLayout);
-            }
-        });
+        swipeContainer.setOnRefreshListener(this::reloadShelter);
 
         recyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        mShelter = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString()).get(0);
-
-        if(mShelter.getMileage() != null) {
+        if (mShelter.getMileage() != null) {
             mileageTextView.setText(getString(R.string.mileage_text, mShelter.getMileage().toString()));
         } else {
             mileageTextView.setText(getString(R.string.mileage_placeholder_text));
         }
-        if(mShelter.getElevation() != null) {
+        if (mShelter.getElevation() != null) {
             elevationTextView.setText(getString(R.string.elevation_text, mShelter.getElevation().toString()));
         } else {
             elevationTextView.setText(getString(R.string.elevation_placeholder_text));
@@ -155,24 +152,24 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             nextButton.setEnabled(false);
         }
 
-        previousButton.setOnClickListener(new View.OnClickListener(){
+        previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderShelter(previousShelter);
+                renderShelter(mShelter, previousShelter);
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener(){
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                renderShelter(nextShelter);
+                renderShelter(mShelter, nextShelter);
             }
         });
 
         recyclerHeader.attachTo(recyclerView);
 
         ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
-        RecyclerView.Adapter mAdapter = new DailyWeatherAdapter(dailyWeathers);
+        RecyclerView.Adapter mAdapter = new DailyWeatherAdapter(mShelter, dailyWeathers);
         recyclerView.setAdapter(mAdapter);
 
         dailyWeatherQuery = DailyWeather.find(DailyWeather.class, "shelter_id = ?", mShelterId.toString());
@@ -183,16 +180,14 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             lastUpdatedTime = getString(R.string.string_last_updated) + " " + lastUpdatedTime + ".";
             lastUpdatedTextView.setText(lastUpdatedTime);
 
-            List<Shelter> shelterQuery = Shelter.find(Shelter.class, "shelter_id = ?", mShelterId.toString());
-            Shelter shelter = shelterQuery.get(0);
-            mShelterName = shelter.getName();
+            mShelterName = mShelter.getName();
             getActivity().setTitle(getTitle());
 
             for (DailyWeather dailyWeather : dailyWeatherQuery) {
                 dailyWeathers.add(dailyWeather);
             }
 
-            mAdapter = new DailyWeatherAdapter(dailyWeathers);
+            mAdapter = new DailyWeatherAdapter(mShelter, dailyWeathers);
             recyclerView.setAdapter(mAdapter);
 
             int millisecondsUntilRefresh = 1000 * 60 * MINUTES_UNTIL_REFRESH;
@@ -204,143 +199,167 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
             Date currentDate = new Date(System.currentTimeMillis());
 
-            if(currentDate.after(timeToUpdate)) {
+            if (currentDate.after(timeToUpdate)) {
                 loadingBar.setVisibility(View.VISIBLE);
-                refresh(false);
+                refreshShelterData();
+            } else {
+                loadingBar.setVisibility(View.GONE);
             }
         } else {
             loadingBar.setVisibility(View.VISIBLE);
-            refresh(false);
+            refreshShelterData();
         }
 
         return view;
     }
 
-    private void renderShelter(Shelter shelter) {
-        int oldShelterId = mShelterId;
-        mShelterId = shelter.getShelterId();
-
-        ShelterDetailFragment fragment = (ShelterDetailFragment) getActivity()
-                .getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_main);
-
-        if(mShelterId > oldShelterId) {
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(
-                            R.anim.fragment_slide_left_enter,
-                            R.anim.fragment_slide_left_exit,
-                            R.anim.fragment_slide_right_enter,
-                            R.anim.fragment_slide_right_exit)
-                    .detach(fragment)
-                    .attach(fragment)
-                    .commit();
-        } else {
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(
-                            R.anim.fragment_slide_right_enter,
-                            R.anim.fragment_slide_right_exit,
-                            R.anim.fragment_slide_left_enter,
-                            R.anim.fragment_slide_left_exit)
-                    .detach(fragment)
-                    .attach(fragment)
-                    .commit();
-        }
-
-    }
-
-    private void refresh(final boolean animationEnabled) {
-        final ArrayList<DailyWeather> dailyWeathers = new ArrayList<>();
-
-        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-        Call<List<Shelter>> call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), null);
-        call.enqueue(new Callback<List<Shelter>>() {
+    private void reloadShelter() {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fragment_bottom_slide_exit);
+        constraintLayout.startAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onResponse(Call<List<Shelter>> call, Response<List<Shelter>> response) {
-                List<Shelter> shelters = response.body();
-                Shelter shelter = shelters.get(0);
-                mShelterName = shelter.getName();
-                getActivity().setTitle(getTitle());
-
-                DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", mShelterId + "");
-                for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
-                    dailyWeathers.add(dailyWeather);
-                    dailyWeather.save();
-                    HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
-                    for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
-                        hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
-                        hourlyWeather.save();
-                    }
-                }
-                loadingBar.setVisibility(View.GONE);
-                swipeContainer.setRefreshing(false);
-                ((DailyWeatherAdapter)recyclerView.getAdapter()).refill(dailyWeathers);
-
-                lastUpdatedTextView.setText(R.string.string_last_updated_now);
-
-                if(animationEnabled){
-                    slideInAnimation();
-                }
-
-                ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-
-                call = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), DIST_MILES);
-                call.enqueue(new Callback<List<Shelter>>() {
-
-                    @Override
-                    public void onResponse(Call<List<Shelter>> call, Response<List<Shelter>> response) {
-                        final List<Shelter> shelters = response.body();
-                        new Thread(new Runnable() {
-                            public void run() {
-                                for (Shelter shelter : shelters) {
-                                    DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", shelter.getShelterId() + "");
-                                    for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
-                                        dailyWeathers.add(dailyWeather);
-                                        dailyWeather.save();
-                                        HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
-                                        for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
-                                            hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
-                                            hourlyWeather.save();
-                                        }
-                                    }
-                                }
-                            }
-                        }).start();
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<Shelter>> call, Throwable t) {
-                        Toast.makeText(getContext(), "Sorry, we could not load the next " + DIST_MILES + " miles. Please try again.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+            public void onAnimationStart(Animation animation) {
             }
 
             @Override
-            public void onFailure(Call<List<Shelter>> call, Throwable t) {
-                loadingBar.setVisibility(View.GONE);
-                swipeContainer.setRefreshing(false);
+            public void onAnimationEnd(Animation animation) {
+                constraintLayout.setVisibility(View.GONE);
+                refreshShelterData();
+                new Handler().postDelayed(() -> {
+                    loadingBar.setVisibility(View.GONE);
+                    swipeContainer.setRefreshing(false);
+                    fadeUpFragment();
+                }, ANIM_DURATION);
+            }
 
-                if (dailyWeatherQuery.size() == 0) {
-                    getFragmentManager().popBackStack();
-                    Toast.makeText(getContext(), "Sorry, there was no offline data available and we could not load new data for this shelter.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Sorry we could not load the weather for this shelter. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-
-                if(animationEnabled){
-                    slideInAnimation();
-                }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
             }
         });
     }
 
-    public void slideInAnimation() {
-        YoYo.with(Techniques.SlideInLeft)
-                .duration(ANIM_DURATION)
-                .repeat(1)
-                .playOn(constraintLayout);
+    private void fadeUpFragment() {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fragment_bottom_slide_enter);
+        constraintLayout.startAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                constraintLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+    }
+
+    private void renderShelter(Shelter currentShelter, Shelter newShelter) {
+        mShelterId = newShelter.getShelterId();
+        mShelter = newShelter;
+
+        FragmentManager manager = requireActivity().getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+
+        if (newShelter.getMileage() > currentShelter.getMileage()) {
+            transaction.setCustomAnimations(
+                    R.anim.fragment_slide_left_enter,
+                    R.anim.fragment_slide_left_exit,
+                    R.anim.fragment_slide_right_enter,
+                    R.anim.fragment_slide_right_exit
+            );
+        } else {
+            transaction.setCustomAnimations(
+                    R.anim.fragment_slide_right_enter,
+                    R.anim.fragment_slide_right_exit,
+                    R.anim.fragment_slide_left_enter,
+                    R.anim.fragment_slide_left_exit
+            );
+        }
+
+        transaction.detach(this).attach(this).commit();
+    }
+
+    private void refreshShelterData() {
+        Call<List<Shelter>> shelterRequest = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), null);
+        shelterRequest.enqueue(new Callback<List<Shelter>>() {
+            @Override
+            public void onResponse(Call<List<Shelter>> request, Response<List<Shelter>> response) {
+                final List<Shelter> shelters = response.body();
+                Shelter shelter = shelters.get(0);
+                mShelterName = shelter.getName();
+                getActivity().setTitle(getTitle());
+
+                ArrayList<DailyWeather> dailyWeathers = new ArrayList<>(shelter.getDailyWeather());
+
+                loadingBar.setVisibility(View.GONE);
+                lastUpdatedTextView.setText(R.string.string_last_updated_now);
+
+                ((DailyWeatherAdapter) recyclerView.getAdapter()).refill(dailyWeathers);
+                storeShelterData(dailyWeathers);
+            }
+
+            @Override
+            public void onFailure(Call<List<Shelter>> request, Throwable t) {
+                String toastMessage;
+                if (dailyWeatherQuery.size() == 0) {
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    toastMessage = "Sorry, there was no offline data available and we could not load new data for this shelter.";
+                } else {
+                    toastMessage = "Sorry we could not load the weather for this shelter. Please try again.";
+                }
+                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_SHORT).show();
+                loadingBar.setVisibility(View.GONE);
+            }
+        });
+
+        Call<List<Shelter>> massShelterRequest = apiService.getShelter(mShelterId, getString(R.string.atforecast_api_key), DIST_MILES);
+        massShelterRequest.enqueue(new Callback<List<Shelter>>() {
+            @Override
+            public void onResponse(Call<List<Shelter>> request, Response<List<Shelter>> response) {
+                final List<Shelter> shelters = response.body();
+
+                executor.execute(() -> {
+                    //Background work here
+                    //todo need some kind of last updated or is updating thing
+                    storeMassHistoryData(shelters);
+                });
+            }
+
+            @Override
+            public void onFailure(Call<List<Shelter>> request, Throwable t) {
+                Toast.makeText(getContext(), "Sorry, we could not load the next " + DIST_MILES + " miles. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void storeShelterData(ArrayList<DailyWeather> dailyWeathers) {
+        DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", mShelterId + "");
+        for (DailyWeather dailyWeather : dailyWeathers) {
+            dailyWeather.save();
+            HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
+            for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
+                hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
+                hourlyWeather.save();
+            }
+        }
+    }
+
+    private void storeMassHistoryData(List<Shelter> shelters) {
+        for (Shelter shelter : shelters) {
+            DailyWeather.deleteAll(DailyWeather.class, "shelter_id = ?", shelter.getShelterId() + "");
+            for (DailyWeather dailyWeather : shelter.getDailyWeather()) {
+                dailyWeather.save();
+                HourlyWeather.deleteAll(HourlyWeather.class, "daily_weather_id = ?", dailyWeather.getDailyWeatherId() + "");
+                for (HourlyWeather hourlyWeather : dailyWeather.getHourlyWeather()) {
+                    hourlyWeather.setDailyWeatherId(dailyWeather.getDailyWeatherId());
+                    hourlyWeather.save();
+                }
+            }
+        }
     }
 
     @Override
@@ -359,5 +378,4 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
         super.onCreateOptionsMenu(menu, inflater);
         getActivity().getMenuInflater().inflate(R.menu.detail_menu, menu);
     }
-
 }

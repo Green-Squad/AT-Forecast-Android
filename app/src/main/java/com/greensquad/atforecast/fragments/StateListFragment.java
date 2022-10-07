@@ -1,22 +1,23 @@
 package com.greensquad.atforecast.fragments;
 
 
-import android.animation.Animator;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.greensquad.atforecast.APIController;
 import com.greensquad.atforecast.ATForecastAPI;
 import com.greensquad.atforecast.R;
@@ -62,30 +63,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
         loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                YoYo.with(Techniques.SlideOutRight)
-                        .duration(ANIM_DURATION)
-                        .repeat(1)
-                        .withListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {}
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                refresh();
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {}
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {}
-                        })
-                        .playOn(recyclerView);
-            }
-        });
+        swipeContainer.setOnRefreshListener(this::reloadShelter);
 
         final ArrayList<State> states = new ArrayList<>();
 
@@ -147,14 +125,14 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
             if(currentDate.after(timeToUpdate)) {
                 loadingBar.setVisibility(View.VISIBLE);
-                refresh();
+                refreshData();
             }
         }
 
         return view;
     }
 
-    private void refresh() {
+    private void refreshData() {
         ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
         Call<List<State>> call = apiService.getStates(false, getString(R.string.atforecast_api_key));
 
@@ -168,11 +146,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                     state.save();
                 }
 
-                loadingBar.setVisibility(View.GONE);
-                swipeContainer.setRefreshing(false);
                 ((StateAdapter)recyclerView.getAdapter()).refill(states);
-
-                slideInAnimation();
             }
 
             @Override
@@ -180,18 +154,52 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 loadingBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
                 Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
-                Log.e(LOG_TAG, t.toString());
-
-                slideInAnimation();
             }
         });
     }
 
-    public void slideInAnimation() {
-        YoYo.with(Techniques.SlideInLeft)
-                .duration(ANIM_DURATION)
-                .repeat(1)
-                .playOn(recyclerView);
+    private void reloadShelter() {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fragment_bottom_slide_exit);
+        recyclerView.startAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                recyclerView.setVisibility(View.GONE);
+                refreshData();
+                new Handler().postDelayed(() -> {
+                    loadingBar.setVisibility(View.GONE);
+                    swipeContainer.setRefreshing(false);
+                    fadeUpFragment();
+                }, 500);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+    }
+
+    private void fadeUpFragment() {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fragment_bottom_slide_enter);
+        recyclerView.startAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
     }
 
     @Override
