@@ -3,7 +3,6 @@ package com.greensquad.atforecast.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,17 +35,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StateListFragment extends BaseFragment implements BackButtonSupportFragment{
-    private static final String LOG_TAG = StateListFragment.class.getSimpleName();
-    private static  final int ANIM_DURATION = 300;
+public class StateListFragment extends BaseFragment implements BackButtonSupportFragment {
+    private static final int ANIM_DURATION = 300;
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeContainer;
-    private View loadingBar;
 
-    public StateListFragment() {}
+    public StateListFragment() {
+    }
 
-    public static StateListFragment newInstance() { return new StateListFragment(); }
+    public static StateListFragment newInstance() {
+        return new StateListFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,7 +60,6 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         swipeContainer = view.findViewById(R.id.swipeContainer);
         recyclerView = view.findViewById(R.id.main_recycler_view);
-        loadingBar = getActivity().findViewById(R.id.loadingPanel);
 
         swipeContainer.setColorSchemeResources(R.color.colorPrimary);
         swipeContainer.setOnRefreshListener(this::reloadShelter);
@@ -77,18 +76,17 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
 
         List<State> dbStates = State.listAll(State.class);
 
-        RecyclerView.Adapter mAdapter = new StateAdapter(new ArrayList<>(dbStates));
+        RecyclerView.Adapter<StateAdapter.ViewHolder> mAdapter = new StateAdapter(new ArrayList<>(dbStates));
         recyclerView.setAdapter(mAdapter);
 
         if (dbStates.isEmpty() || Shelter.listAll(Shelter.class).get(0).getElevation() == null) {
+            swipeContainer.setRefreshing(true);
+
             ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-            Call<List<State>> call = apiService.getStates(true, getString(R.string.atforecast_api_key));
-
-            loadingBar.setVisibility(View.VISIBLE);
-
-            call.enqueue(new Callback<List<State>>() {
+            Call<List<State>> request = apiService.getStates(true, getString(R.string.atforecast_api_key));
+            request.enqueue(new Callback<List<State>>() {
                 @Override
-                public void onResponse(Call<List<State>> call, Response<List<State>> response) {
+                public void onResponse(Call<List<State>> request, Response<List<State>> response) {
                     List<State> statesList = response.body();
                     for (State state : statesList) {
                         states.add(state);
@@ -100,15 +98,14 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                         }
                     }
 
-                    loadingBar.setVisibility(View.GONE);
-                    ((StateAdapter)recyclerView.getAdapter()).refill(states);
+                    swipeContainer.setRefreshing(false);
+                    ((StateAdapter) recyclerView.getAdapter()).refill(states);
                 }
 
                 @Override
-                public void onFailure(Call<List<State>>call, Throwable t) {
-                    loadingBar.setVisibility(View.GONE);
+                public void onFailure(Call<List<State>> request, Throwable t) {
+                    swipeContainer.setRefreshing(false);
                     Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
-                    Log.e(LOG_TAG, t.toString());
                 }
             });
         } else {
@@ -123,8 +120,7 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
             Date timeToUpdate = new Date(updatedAtDateInMillis + millisecondsUntilRefresh);
             Date currentDate = new Date(System.currentTimeMillis());
 
-            if(currentDate.after(timeToUpdate)) {
-                loadingBar.setVisibility(View.VISIBLE);
+            if (currentDate.after(timeToUpdate)) {
                 refreshData();
             }
         }
@@ -133,12 +129,14 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
     }
 
     private void refreshData() {
-        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
-        Call<List<State>> call = apiService.getStates(false, getString(R.string.atforecast_api_key));
+        swipeContainer.setRefreshing(true);
 
-        call.enqueue(new Callback<List<State>>() {
+        ATForecastAPI apiService = APIController.getClient().create(ATForecastAPI.class);
+        Call<List<State>> request = apiService.getStates(false, getString(R.string.atforecast_api_key));
+
+        request.enqueue(new Callback<List<State>>() {
             @Override
-            public void onResponse(Call<List<State>> call, Response<List<State>> response) {
+            public void onResponse(Call<List<State>> request, Response<List<State>> response) {
                 ArrayList<State> states = new ArrayList<>();
                 List<State> statesList = response.body();
                 for (State state : statesList) {
@@ -146,12 +144,12 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                     state.save();
                 }
 
-                ((StateAdapter)recyclerView.getAdapter()).refill(states);
+                ((StateAdapter) recyclerView.getAdapter()).refill(states);
+                swipeContainer.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<List<State>>call, Throwable t) {
-                loadingBar.setVisibility(View.GONE);
+            public void onFailure(Call<List<State>> request, Throwable t) {
                 swipeContainer.setRefreshing(false);
                 Toast.makeText(getContext(), "Error loading content. Please try again.", Toast.LENGTH_SHORT).show();
             }
@@ -171,10 +169,8 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
                 recyclerView.setVisibility(View.GONE);
                 refreshData();
                 new Handler().postDelayed(() -> {
-                    loadingBar.setVisibility(View.GONE);
-                    swipeContainer.setRefreshing(false);
                     fadeUpFragment();
-                }, 500);
+                }, ANIM_DURATION);
             }
 
             @Override
@@ -211,5 +207,4 @@ public class StateListFragment extends BaseFragment implements BackButtonSupport
     public boolean onBackPressed() {
         return false;
     }
-
 }

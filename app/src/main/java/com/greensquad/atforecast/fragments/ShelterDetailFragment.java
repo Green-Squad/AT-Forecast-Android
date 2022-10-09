@@ -35,13 +35,10 @@ import com.greensquad.atforecast.models.Shelter;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
-import org.shredzone.commons.suncalc.SunTimes;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -280,7 +277,10 @@ public class ShelterDetailFragment extends BaseFragment implements BackButtonSup
             );
         }
 
-        transaction.detach(this).attach(this).commit();
+        transaction
+                .detach(this)
+                .attach(this)
+                .commit();
     }
 
     private void refreshShelterData() {
