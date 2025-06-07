@@ -1,0 +1,80 @@
+[
+  {
+    "state_id": 1,
+    "name": "Georgia",
+    "average_high": 81,
+    "average_low": 61
+  },
+  {
+    "state_id": 2,
+    "name": "North Carolina",
+    "average_high": 75,
+    "average_low": 58
+  },
+  {
+    "state_id": 3,
+    "name": "Tennessee",
+    "average_high": 75,
+    "average_low": 58
+  },
+  {
+    "state_id": 4,
+    "name": "Virginia",
+    "average_high": 75,
+    "average_low": 60
+  },
+  {
+    "state_id": 5,
+    "name": "Maryland",
+    "average_high": 75,
+    "average_low": 62
+  },
+  {
+    "state_id": 6,
+    "name": "Pennsylvania",
+    "average_high": 73,
+    "average_low": 60
+  },
+  {
+    "state_id": 7,
+    "name": "New Jersey",
+    "average_high": 69,
+    "average_low": 57
+  },
+  {
+    "state_id": 8,
+    "name": "New York",
+    "average_high": 66,
+    "average_low": 58
+  },
+  {
+    "state_id": 9,
+    "name": "Connecticut",
+    "average_high": 64,
+    "average_low": 57
+  },
+  {
+    "state_id": 10,
+    "name": "Massachusetts",
+    "average_high": 61,
+    "average_low": 54
+  },
+  {
+    "state_id": 11,
+    "name": "Vermont",
+    "average_high": 61,
+    "average_low": 51
+  },
+  {
+    "state_id": 12,
+    "name": "New Hampshire",
+    "average_high": 57,
+    "average_low": 49
+  },
+  {
+    "state_id": 13,
+    "name": "Maine",
+    "average_high": 63,
+    "average_low": 52
+  }
+]
