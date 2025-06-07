@@ -1,10 +1,11 @@
 module.exports = {
   name: 'AT Forecast',
-  slug: 'at-forecast',
+  slug: 'atforecast',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './src/assets/icon.png',
   userInterfaceStyle: 'automatic',
+  owner: "greensquad",
   splash: {
     image: './src/assets/splash.png',
     resizeMode: 'contain',
@@ -30,5 +31,10 @@ module.exports = {
   },
   web: {
     favicon: './src/assets/favicon.png'
+  },
+  extra: {
+    eas: {
+      projectId: "6f679c4a-c528-47b3-b935-423b108b34cd"
+    }
   }
 }; 
