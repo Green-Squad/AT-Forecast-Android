@@ -16,14 +16,14 @@ module.exports = {
   ],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.greensquad.atforecast'
+    bundleIdentifier: 'com.greensquad.atforecast2'
   },
   android: {
     adaptiveIcon: {
       foregroundImage: './src/assets/adaptive-icon.png',
       backgroundColor: '#ffffff'
     },
-    package: 'com.greensquad.atforecast',
+    package: 'com.greensquad.atforecast2',
     permissions: [
       'ACCESS_FINE_LOCATION',
       'ACCESS_COARSE_LOCATION'
