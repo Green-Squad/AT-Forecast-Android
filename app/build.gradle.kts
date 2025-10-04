@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +8,14 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+}
+
+// Load API key from local.properties
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
 }
 
 android {
@@ -19,6 +30,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Room schema export
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+
+        // Add API key to BuildConfig
+        buildConfigField("String", "ATFORECAST_API_KEY", "\"${localProperties.getProperty("atforecast.api.key", "")}\"")
     }
 
     buildTypes {
@@ -39,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -68,6 +88,27 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Retrofit & Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.gson)
+    implementation(libs.okhttp.logging)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
+    // Location
+    implementation(libs.play.services.location)
+
+    // Image Loading (Coil)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
