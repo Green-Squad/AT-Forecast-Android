@@ -31,11 +31,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Room schema export
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-
         // Add API key to BuildConfig
         buildConfigField("String", "ATFORECAST_API_KEY", "\"${localProperties.getProperty("atforecast.api.key", "")}\"")
     }
@@ -53,13 +48,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
         buildConfig = true
     }
+}
+
+// Room schema export configuration for KSP
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -77,7 +79,6 @@ dependencies {
     // Hilt dependencies
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3.android)
     ksp(libs.hilt.compiler)
 
     // Navigation Compose
@@ -105,10 +106,7 @@ dependencies {
 
     // Location
     implementation(libs.play.services.location)
-
-    // Image Loading (Coil)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

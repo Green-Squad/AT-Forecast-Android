@@ -1,0 +1,306 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "46bb678eb7bddd274dd4a0ad6e560edb",
+    "entities": [
+      {
+        "tableName": "states",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stateId` INTEGER NOT NULL, `name` TEXT NOT NULL, `averageHigh` INTEGER NOT NULL, `averageLow` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`stateId`))",
+        "fields": [
+          {
+            "fieldPath": "stateId",
+            "columnName": "stateId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageHigh",
+            "columnName": "averageHigh",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "averageLow",
+            "columnName": "averageLow",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "stateId"
+          ]
+        }
+      },
+      {
+        "tableName": "shelters",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shelterId` INTEGER NOT NULL, `name` TEXT NOT NULL, `mileage` REAL NOT NULL, `elevation` INTEGER, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `stateId` INTEGER NOT NULL, PRIMARY KEY(`shelterId`), FOREIGN KEY(`stateId`) REFERENCES `states`(`stateId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "shelterId",
+            "columnName": "shelterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mileage",
+            "columnName": "mileage",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "elevation",
+            "columnName": "elevation",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stateId",
+            "columnName": "stateId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "shelterId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_shelters_stateId",
+            "unique": false,
+            "columnNames": [
+              "stateId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shelters_stateId` ON `${TABLE_NAME}` (`stateId`)"
+          },
+          {
+            "name": "index_shelters_mileage",
+            "unique": false,
+            "columnNames": [
+              "mileage"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shelters_mileage` ON `${TABLE_NAME}` (`mileage`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "states",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "stateId"
+            ],
+            "referencedColumns": [
+              "stateId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "daily_weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dailyWeatherId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `shelterId` INTEGER NOT NULL, `weatherDate` TEXT NOT NULL, `high` INTEGER NOT NULL, `low` INTEGER NOT NULL, `description` TEXT NOT NULL, `wind` TEXT NOT NULL, `updatedAt` INTEGER NOT NULL, FOREIGN KEY(`shelterId`) REFERENCES `shelters`(`shelterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "dailyWeatherId",
+            "columnName": "dailyWeatherId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shelterId",
+            "columnName": "shelterId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weatherDate",
+            "columnName": "weatherDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "high",
+            "columnName": "high",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "low",
+            "columnName": "low",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wind",
+            "columnName": "wind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "dailyWeatherId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_daily_weather_shelterId",
+            "unique": false,
+            "columnNames": [
+              "shelterId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_daily_weather_shelterId` ON `${TABLE_NAME}` (`shelterId`)"
+          },
+          {
+            "name": "index_daily_weather_weatherDate",
+            "unique": false,
+            "columnNames": [
+              "weatherDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_daily_weather_weatherDate` ON `${TABLE_NAME}` (`weatherDate`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shelters",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "shelterId"
+            ],
+            "referencedColumns": [
+              "shelterId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "hourly_weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hourlyWeatherId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dailyWeatherId` INTEGER NOT NULL, `date` TEXT NOT NULL, `temp` INTEGER NOT NULL, `description` TEXT NOT NULL, `wind` TEXT NOT NULL, FOREIGN KEY(`dailyWeatherId`) REFERENCES `daily_weather`(`dailyWeatherId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "hourlyWeatherId",
+            "columnName": "hourlyWeatherId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dailyWeatherId",
+            "columnName": "dailyWeatherId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temp",
+            "columnName": "temp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wind",
+            "columnName": "wind",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "hourlyWeatherId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_hourly_weather_dailyWeatherId",
+            "unique": false,
+            "columnNames": [
+              "dailyWeatherId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_hourly_weather_dailyWeatherId` ON `${TABLE_NAME}` (`dailyWeatherId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "daily_weather",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dailyWeatherId"
+            ],
+            "referencedColumns": [
+              "dailyWeatherId"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '46bb678eb7bddd274dd4a0ad6e560edb')"
+    ]
+  }
+}

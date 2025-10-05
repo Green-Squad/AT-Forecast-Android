@@ -1,15 +1,27 @@
 package com.gsnamespace.atforecast.di
 
+import android.content.Context
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 /**
  * Hilt module for providing location-related dependencies.
- * This will be implemented in Phase 5 when we add GPS functionality.
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object LocationModule {
-    // FusedLocationProviderClient will be added in Phase 5
+
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(
+        @ApplicationContext context: Context
+    ): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(context)
+    }
 }
