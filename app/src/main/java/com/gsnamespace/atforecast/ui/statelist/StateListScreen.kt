@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
+import androidx.compose.foundation.layout.height
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gsnamespace.atforecast.domain.model.State
@@ -48,6 +49,8 @@ import com.gsnamespace.atforecast.ui.components.StateImage
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.gsnamespace.atforecast.R
 
 /**
  * State List Screen - Browse AT states with average temperatures
@@ -64,7 +67,9 @@ fun StateListScreen(
     val currentTemperatureUnit by viewModel.currentTemperatureUnit.collectAsStateWithLifecycle()
     val currentThemeMode by viewModel.currentThemeMode.collectAsStateWithLifecycle()
     var showSettingsDialog by remember { mutableStateOf(false) }
-    var showSearchDialog by remember { mutableStateOf(false) }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var showSearchField by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
     var requestLocationPermission by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -73,33 +78,135 @@ fun StateListScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("ATForecast") },
+                title = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = !isSearchActive,
+                            exit = androidx.compose.animation.slideOutHorizontally(
+                                targetOffsetX = { -it },
+                                animationSpec = androidx.compose.animation.core.tween(durationMillis = 150)
+                            ) + androidx.compose.animation.fadeOut(
+                                animationSpec = androidx.compose.animation.core.tween(durationMillis = 150)
+                            )
+                        ) {
+                            Text("ATForecast")
+                        }
+
+                        if (showSearchField) {
+                            androidx.compose.material3.TextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                placeholder = {
+                                    Text(
+                                        text = androidx.compose.ui.res.stringResource(R.string.search_placeholder),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
+                                    )
+                                },
+                                singleLine = true,
+                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                                    imeAction = androidx.compose.ui.text.input.ImeAction.Search
+                                ),
+                                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                                    onSearch = {
+                                        val mileage = searchQuery.toDoubleOrNull()
+                                        if (mileage != null) {
+                                            coroutineScope.launch {
+                                                val shelterId = viewModel.searchByMileage(mileage)
+                                                if (shelterId != null) {
+                                                    onNavigateToShelter(shelterId)
+                                                    isSearchActive = false
+                                                    showSearchField = false
+                                                    searchQuery = ""
+                                                } else {
+                                                    Toast.makeText(context, "No shelter found at mile $mileage", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        }
+                                    }
+                                ),
+                                colors = androidx.compose.material3.TextFieldDefaults.colors(
+                                    focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                },
+                navigationIcon = {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = isSearchActive,
+                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.scaleIn(),
+                        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.scaleOut()
+                    ) {
+                        IconButton(onClick = {
+                            isSearchActive = false
+                            showSearchField = false
+                            searchQuery = ""
+                        }) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Close search"
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 actions = {
-                    IconButton(onClick = { showSearchDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search by mileage"
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = !isSearchActive,
+                        exit = androidx.compose.animation.slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = androidx.compose.animation.core.tween(durationMillis = 150)
+                        ) + androidx.compose.animation.fadeOut(
+                            animationSpec = androidx.compose.animation.core.tween(durationMillis = 150)
                         )
-                    }
-                    IconButton(onClick = {
-                        android.util.Log.d("StateListScreen", "GPS button clicked")
-                        requestLocationPermission = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.MyLocation,
-                            contentDescription = "Find nearest shelters"
-                        )
-                    }
-                    IconButton(onClick = { showSettingsDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings"
-                        )
+                    ) {
+                        Row {
+                            IconButton(onClick = {
+                                isSearchActive = true
+                                coroutineScope.launch {
+                                    kotlinx.coroutines.delay(300)
+                                    showSearchField = true
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Search by mileage"
+                                )
+                            }
+                            IconButton(onClick = {
+                                android.util.Log.d("StateListScreen", "GPS button clicked")
+                                requestLocationPermission = true
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.MyLocation,
+                                    contentDescription = "Find nearest shelters"
+                                )
+                            }
+                            IconButton(onClick = { showSettingsDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings"
+                                )
+                            }
+                        }
                     }
                 }
             )
@@ -157,19 +264,6 @@ fun StateListScreen(
         )
     }
 
-    if (showSearchDialog) {
-        MileageSearchDialog(
-            onSearch = { mileage ->
-                coroutineScope.launch {
-                    val shelterId = viewModel.searchByMileage(mileage)
-                    if (shelterId != null) {
-                        onNavigateToShelter(shelterId)
-                    }
-                }
-            },
-            onDismiss = { showSearchDialog = false }
-        )
-    }
 
     if (requestLocationPermission) {
         android.util.Log.d("StateListScreen", "Requesting location permission")

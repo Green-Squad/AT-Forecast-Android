@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">ATForecast</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Enter mile marker…</string>
+    <string name="search_description">Search by mileage</string>
+    <string name="close_search_description">Close search</string>
+
+    <!-- Navigation -->
+    <string name="back_description">Back</string>
+
+    <!-- Location -->
+    <string name="find_nearest_shelters_description">Find nearest shelters</string>
+    <string name="finding_nearest_shelter">Finding nearest shelter…</string>
+    <string name="no_nearby_shelters">Could not find nearby shelters</string>
+    <string name="location_permission_denied">Location permission denied</string>
+
+    <!-- Settings -->
+    <string name="settings_description">Settings</string>
+
+    <!-- Shelter Detail -->
+    <string name="shelter_details">Shelter Details</string>
+    <string name="previous_shelter">Previous shelter</string>
+    <string name="next_shelter">Next shelter</string>
+
+    <!-- Messages -->
+    <string name="no_shelter_found_at_mile">No shelter found at mile %1$s</string>
 </resources>
