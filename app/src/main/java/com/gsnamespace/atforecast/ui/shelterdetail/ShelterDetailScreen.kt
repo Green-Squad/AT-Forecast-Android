@@ -20,10 +20,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
@@ -50,6 +54,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gsnamespace.atforecast.domain.model.DailyWeather
 import com.gsnamespace.atforecast.domain.model.HourlyWeather
+import com.gsnamespace.atforecast.ui.components.DistanceUnitDialog
+import com.gsnamespace.atforecast.ui.components.TemperatureUnitDialog
+import com.gsnamespace.atforecast.ui.components.ThemeModeDialog
 import com.gsnamespace.atforecast.ui.components.WeatherIcon
 import com.gsnamespace.atforecast.domain.model.Shelter
 import com.gsnamespace.atforecast.domain.model.ShelterWithWeather
@@ -74,7 +81,17 @@ fun ShelterDetailScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val hasPreviousShelter by viewModel.hasPreviousShelter.collectAsStateWithLifecycle()
     val hasNextShelter by viewModel.hasNextShelter.collectAsStateWithLifecycle()
+    val previousShelterDistance by viewModel.previousShelterDistance.collectAsStateWithLifecycle()
+    val nextShelterDistance by viewModel.nextShelterDistance.collectAsStateWithLifecycle()
+    val currentTemperatureUnit by viewModel.currentTemperatureUnit.collectAsStateWithLifecycle()
+    val currentDistanceUnit by viewModel.currentDistanceUnit.collectAsStateWithLifecycle()
+    val currentThemeMode by viewModel.currentThemeMode.collectAsStateWithLifecycle()
+    var showOverflowMenu by remember { mutableStateOf(false) }
+    var showTemperatureDialog by remember { mutableStateOf(false) }
+    var showDistanceDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -82,10 +99,12 @@ fun ShelterDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        when (val state = uiState) {
+                        text = when (val state = uiState) {
                             is ShelterDetailUiState.Success -> state.shelterWithWeather.shelter.name
                             else -> "Shelter Details"
-                        }
+                        },
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
@@ -96,10 +115,47 @@ fun ShelterDetailScreen(
                         )
                     }
                 },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showOverflowMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "More options"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showOverflowMenu,
+                            onDismissRequest = { showOverflowMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Temperature Unit") },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    showTemperatureDialog = true
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Distance Unit") },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    showDistanceDialog = true
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Theme") },
+                                onClick = {
+                                    showOverflowMenu = false
+                                    showThemeDialog = true
+                                }
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
         }
@@ -124,6 +180,9 @@ fun ShelterDetailScreen(
                 is ShelterDetailUiState.Success -> {
                     ShelterDetailContent(
                         shelterWithWeather = state.shelterWithWeather,
+                        distanceUnit = currentDistanceUnit,
+                        previousShelterDistance = previousShelterDistance,
+                        nextShelterDistance = nextShelterDistance,
                         hasPreviousShelter = hasPreviousShelter,
                         hasNextShelter = hasNextShelter,
                         onNavigateToPrevious = {
@@ -156,11 +215,38 @@ fun ShelterDetailScreen(
             }
         }
     }
+
+    if (showTemperatureDialog) {
+        TemperatureUnitDialog(
+            currentUnit = currentTemperatureUnit,
+            onUnitChange = { viewModel.setTemperatureUnit(it) },
+            onDismiss = { showTemperatureDialog = false }
+        )
+    }
+
+    if (showDistanceDialog) {
+        DistanceUnitDialog(
+            currentUnit = currentDistanceUnit,
+            onUnitChange = { viewModel.setDistanceUnit(it) },
+            onDismiss = { showDistanceDialog = false }
+        )
+    }
+
+    if (showThemeDialog) {
+        ThemeModeDialog(
+            currentMode = currentThemeMode,
+            onModeChange = { viewModel.setThemeMode(it, context) },
+            onDismiss = { showThemeDialog = false }
+        )
+    }
 }
 
 @Composable
 private fun ShelterDetailContent(
     shelterWithWeather: ShelterWithWeather,
+    distanceUnit: com.gsnamespace.atforecast.domain.model.DistanceUnit,
+    previousShelterDistance: Double?,
+    nextShelterDistance: Double?,
     hasPreviousShelter: Boolean,
     hasNextShelter: Boolean,
     onNavigateToPrevious: () -> Unit,
@@ -177,6 +263,9 @@ private fun ShelterDetailContent(
             NavigationButtons(
                 hasPrevious = hasPreviousShelter,
                 hasNext = hasNextShelter,
+                previousDistance = previousShelterDistance,
+                nextDistance = nextShelterDistance,
+                distanceUnit = distanceUnit,
                 onPreviousClick = onNavigateToPrevious,
                 onNextClick = onNavigateToNext
             )
@@ -186,6 +275,7 @@ private fun ShelterDetailContent(
         item {
             ShelterInfoCard(
                 shelter = shelterWithWeather.shelter,
+                distanceUnit = distanceUnit,
                 lastUpdated = shelterWithWeather.lastUpdated
             )
         }
@@ -204,6 +294,7 @@ private fun ShelterDetailContent(
         itemsIndexed(shelterWithWeather.dailyWeather, key = { _, item -> item.dailyWeatherId }) { index, dailyWeather ->
             DailyWeatherCard(
                 dailyWeather = dailyWeather,
+                distanceUnit = distanceUnit,
                 expanded = expandedCardIndex == index,
                 onExpandChange = { expandedCardIndex = index }
             )
@@ -224,7 +315,11 @@ private fun ShelterDetailContent(
 }
 
 @Composable
-private fun ShelterInfoCard(shelter: Shelter, lastUpdated: Long) {
+private fun ShelterInfoCard(
+    shelter: Shelter,
+    distanceUnit: com.gsnamespace.atforecast.domain.model.DistanceUnit,
+    lastUpdated: Long
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,11 +333,18 @@ private fun ShelterInfoCard(shelter: Shelter, lastUpdated: Long) {
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
-                    InfoRow(label = "Mileage", value = "Mile ${String.format("%.1f", shelter.mileage)}")
+                    val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(shelter.mileage, distanceUnit)
+                    val distanceLabel = when (distanceUnit) {
+                        com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> "Mile"
+                        com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> "Kilometer"
+                    }
+                    InfoRow(label = distanceLabel, value = distanceValue)
                 }
-                shelter.elevation?.let {
+                shelter.elevation?.let { elevation ->
                     Column(modifier = Modifier.weight(1f)) {
-                        InfoRow(label = "Elevation", value = "$it ft")
+                        val elevationValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatElevation(elevation, distanceUnit)
+                        val elevationLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getElevationUnitLabel(distanceUnit)
+                        InfoRow(label = "Elevation", value = "$elevationValue $elevationLabel")
                     }
                 }
             }
@@ -285,6 +387,7 @@ private fun InfoRow(label: String, value: String) {
 @Composable
 private fun DailyWeatherCard(
     dailyWeather: DailyWeather,
+    distanceUnit: com.gsnamespace.atforecast.domain.model.DistanceUnit,
     expanded: Boolean,
     onExpandChange: () -> Unit
 ) {
@@ -360,7 +463,10 @@ private fun DailyWeatherCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     dailyWeather.hourlyWeather.forEach { hourly ->
-                        HourlyWeatherRow(hourlyWeather = hourly)
+                        HourlyWeatherRow(
+                            hourlyWeather = hourly,
+                            distanceUnit = distanceUnit
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
 
@@ -378,7 +484,10 @@ private fun DailyWeatherCard(
 }
 
 @Composable
-private fun HourlyWeatherRow(hourlyWeather: HourlyWeather) {
+private fun HourlyWeatherRow(
+    hourlyWeather: HourlyWeather,
+    distanceUnit: com.gsnamespace.atforecast.domain.model.DistanceUnit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -400,8 +509,9 @@ private fun HourlyWeatherRow(hourlyWeather: HourlyWeather) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            val windSpeed = com.gsnamespace.atforecast.domain.util.UnitConverter.formatWindSpeed(hourlyWeather.wind, distanceUnit)
             Text(
-                text = hourlyWeather.wind,
+                text = windSpeed,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
@@ -419,6 +529,9 @@ private fun HourlyWeatherRow(hourlyWeather: HourlyWeather) {
 private fun NavigationButtons(
     hasPrevious: Boolean,
     hasNext: Boolean,
+    previousDistance: Double?,
+    nextDistance: Double?,
+    distanceUnit: com.gsnamespace.atforecast.domain.model.DistanceUnit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
@@ -428,29 +541,53 @@ private fun NavigationButtons(
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Button(
-            onClick = onPreviousClick,
-            enabled = hasPrevious,
-            modifier = Modifier.weight(1f)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Previous shelter"
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Previous")
+        Box(modifier = Modifier.weight(1f)) {
+            if (hasPrevious) {
+                Button(
+                    onClick = onPreviousClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Previous shelter"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    if (previousDistance != null) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("SOBO")
+                            val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(previousDistance, distanceUnit)
+                            val distanceLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getDistanceUnitLabel(distanceUnit)
+                            Text("$distanceValue $distanceLabel")
+                        }
+                    } else {
+                        Text("Previous")
+                    }
+                }
+            }
         }
-        Button(
-            onClick = onNextClick,
-            enabled = hasNext,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text("Next")
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Next shelter"
-            )
+        Box(modifier = Modifier.weight(1f)) {
+            if (hasNext) {
+                Button(
+                    onClick = onNextClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (nextDistance != null) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("NOBO")
+                            val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(nextDistance, distanceUnit)
+                            val distanceLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getDistanceUnitLabel(distanceUnit)
+                            Text("$distanceValue $distanceLabel")
+                        }
+                    } else {
+                        Text("Next")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Next shelter"
+                    )
+                }
+            }
         }
     }
 }

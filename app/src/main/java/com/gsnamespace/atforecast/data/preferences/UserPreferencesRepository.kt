@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.gsnamespace.atforecast.domain.model.DistanceUnit
 import com.gsnamespace.atforecast.domain.model.TemperatureUnit
 import com.gsnamespace.atforecast.domain.model.ThemeMode
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,7 @@ class UserPreferencesRepository @Inject constructor(
 
     companion object {
         private val TEMPERATURE_UNIT_KEY = stringPreferencesKey("temperature_unit")
+        private val DISTANCE_UNIT_KEY = stringPreferencesKey("distance_unit")
         private val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         const val THEME_MODE_PREF_KEY = "theme_mode"
     }
@@ -37,6 +39,18 @@ class UserPreferencesRepository @Inject constructor(
             TemperatureUnit.valueOf(unitString)
         } catch (e: IllegalArgumentException) {
             TemperatureUnit.FAHRENHEIT
+        }
+    }
+
+    /**
+     * Get the current distance unit preference.
+     */
+    val distanceUnit: Flow<DistanceUnit> = dataStore.data.map { preferences ->
+        val unitString = preferences[DISTANCE_UNIT_KEY] ?: DistanceUnit.IMPERIAL.name
+        try {
+            DistanceUnit.valueOf(unitString)
+        } catch (e: IllegalArgumentException) {
+            DistanceUnit.IMPERIAL
         }
     }
 
@@ -58,6 +72,15 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setTemperatureUnit(unit: TemperatureUnit) {
         dataStore.edit { preferences ->
             preferences[TEMPERATURE_UNIT_KEY] = unit.name
+        }
+    }
+
+    /**
+     * Set the distance unit preference.
+     */
+    suspend fun setDistanceUnit(unit: DistanceUnit) {
+        dataStore.edit { preferences ->
+            preferences[DISTANCE_UNIT_KEY] = unit.name
         }
     }
 

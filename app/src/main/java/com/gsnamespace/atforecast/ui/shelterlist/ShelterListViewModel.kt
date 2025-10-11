@@ -6,6 +6,7 @@ import com.gsnamespace.atforecast.data.location.LocationRepository
 import com.gsnamespace.atforecast.data.preferences.UserPreferencesRepository
 import com.gsnamespace.atforecast.data.repository.ShelterRepository
 import com.gsnamespace.atforecast.domain.mapper.toDomainShelters
+import com.gsnamespace.atforecast.domain.model.DistanceUnit
 import com.gsnamespace.atforecast.domain.model.Shelter
 import com.gsnamespace.atforecast.domain.model.TemperatureUnit
 import com.gsnamespace.atforecast.domain.model.ThemeMode
@@ -47,6 +48,13 @@ class ShelterListViewModel @AssistedInject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = TemperatureUnit.FAHRENHEIT
+        )
+
+    val currentDistanceUnit: StateFlow<DistanceUnit> = userPreferencesRepository.distanceUnit
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = DistanceUnit.IMPERIAL
         )
 
     val currentThemeMode: StateFlow<ThemeMode> = userPreferencesRepository.themeMode
@@ -115,6 +123,15 @@ class ShelterListViewModel @AssistedInject constructor(
     fun setTemperatureUnit(unit: TemperatureUnit) {
         viewModelScope.launch {
             userPreferencesRepository.setTemperatureUnit(unit)
+        }
+    }
+
+    /**
+     * Update the distance unit preference.
+     */
+    fun setDistanceUnit(unit: DistanceUnit) {
+        viewModelScope.launch {
+            userPreferencesRepository.setDistanceUnit(unit)
         }
     }
 

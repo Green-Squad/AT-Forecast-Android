@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,10 +44,12 @@ import androidx.compose.foundation.layout.height
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gsnamespace.atforecast.domain.model.State
+import com.gsnamespace.atforecast.ui.components.DistanceUnitDialog
 import com.gsnamespace.atforecast.ui.components.MileageSearchDialog
 import com.gsnamespace.atforecast.ui.components.RequestLocationPermission
-import com.gsnamespace.atforecast.ui.components.SettingsDialog
 import com.gsnamespace.atforecast.ui.components.StateImage
+import com.gsnamespace.atforecast.ui.components.TemperatureUnitDialog
+import com.gsnamespace.atforecast.ui.components.ThemeModeDialog
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.layout.size
@@ -65,8 +69,12 @@ fun StateListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val currentTemperatureUnit by viewModel.currentTemperatureUnit.collectAsStateWithLifecycle()
+    val currentDistanceUnit by viewModel.currentDistanceUnit.collectAsStateWithLifecycle()
     val currentThemeMode by viewModel.currentThemeMode.collectAsStateWithLifecycle()
-    var showSettingsDialog by remember { mutableStateOf(false) }
+    var showOverflowMenu by remember { mutableStateOf(false) }
+    var showTemperatureDialog by remember { mutableStateOf(false) }
+    var showDistanceDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     var isSearchActive by remember { mutableStateOf(false) }
     var showSearchField by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -200,11 +208,39 @@ fun StateListScreen(
                                     contentDescription = "Find nearest shelters"
                                 )
                             }
-                            IconButton(onClick = { showSettingsDialog = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings"
-                                )
+                            Box {
+                                IconButton(onClick = { showOverflowMenu = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "More options"
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showOverflowMenu,
+                                    onDismissRequest = { showOverflowMenu = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Temperature Unit") },
+                                        onClick = {
+                                            showOverflowMenu = false
+                                            showTemperatureDialog = true
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Distance Unit") },
+                                        onClick = {
+                                            showOverflowMenu = false
+                                            showDistanceDialog = true
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Theme") },
+                                        onClick = {
+                                            showOverflowMenu = false
+                                            showThemeDialog = true
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -254,13 +290,27 @@ fun StateListScreen(
         }
     }
 
-    if (showSettingsDialog) {
-        SettingsDialog(
-            currentTemperatureUnit = currentTemperatureUnit,
-            currentThemeMode = currentThemeMode,
-            onTemperatureUnitChange = { viewModel.setTemperatureUnit(it) },
-            onThemeModeChange = { viewModel.setThemeMode(it, context) },
-            onDismiss = { showSettingsDialog = false }
+    if (showTemperatureDialog) {
+        TemperatureUnitDialog(
+            currentUnit = currentTemperatureUnit,
+            onUnitChange = { viewModel.setTemperatureUnit(it) },
+            onDismiss = { showTemperatureDialog = false }
+        )
+    }
+
+    if (showDistanceDialog) {
+        DistanceUnitDialog(
+            currentUnit = currentDistanceUnit,
+            onUnitChange = { viewModel.setDistanceUnit(it) },
+            onDismiss = { showDistanceDialog = false }
+        )
+    }
+
+    if (showThemeDialog) {
+        ThemeModeDialog(
+            currentMode = currentThemeMode,
+            onModeChange = { viewModel.setThemeMode(it, context) },
+            onDismiss = { showThemeDialog = false }
         )
     }
 

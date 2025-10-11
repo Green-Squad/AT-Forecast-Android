@@ -3,7 +3,10 @@ package com.gsnamespace.atforecast.ui.shelterdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gsnamespace.atforecast.data.repository.ShelterRepository
+import com.gsnamespace.atforecast.domain.model.DistanceUnit
 import com.gsnamespace.atforecast.domain.model.ShelterWithWeather
+import com.gsnamespace.atforecast.domain.model.TemperatureUnit
+import com.gsnamespace.atforecast.domain.model.ThemeMode
 import com.gsnamespace.atforecast.domain.usecase.GetShelterWithWeatherUseCase
 import com.gsnamespace.atforecast.domain.usecase.RefreshWeatherIfStaleUseCase
 import dagger.assisted.Assisted
@@ -12,11 +15,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -44,8 +49,35 @@ class ShelterDetailViewModel @AssistedInject constructor(
     private val _hasNextShelter = MutableStateFlow(false)
     val hasNextShelter: StateFlow<Boolean> = _hasNextShelter.asStateFlow()
 
+    private val _previousShelterDistance = MutableStateFlow<Double?>(null)
+    val previousShelterDistance: StateFlow<Double?> = _previousShelterDistance.asStateFlow()
+
+    private val _nextShelterDistance = MutableStateFlow<Double?>(null)
+    val nextShelterDistance: StateFlow<Double?> = _nextShelterDistance.asStateFlow()
+
     private val temperatureUnit = userPreferencesRepository.temperatureUnit
     private var hasTriggeredAutoRefresh = false
+
+    val currentTemperatureUnit: StateFlow<TemperatureUnit> = userPreferencesRepository.temperatureUnit
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = TemperatureUnit.FAHRENHEIT
+        )
+
+    val currentDistanceUnit: StateFlow<DistanceUnit> = userPreferencesRepository.distanceUnit
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = DistanceUnit.IMPERIAL
+        )
+
+    val currentThemeMode: StateFlow<ThemeMode> = userPreferencesRepository.themeMode
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ThemeMode.SYSTEM
+        )
 
     @AssistedFactory
     interface Factory {
@@ -58,12 +90,27 @@ class ShelterDetailViewModel @AssistedInject constructor(
     }
 
     /**
-     * Check if previous/next shelters are available.
+     * Check if previous/next shelters are available and calculate distances.
      */
     private fun checkNavigationAvailability() {
         viewModelScope.launch {
-            _hasPreviousShelter.value = shelterRepository.getPreviousShelter(shelterId) != null
-            _hasNextShelter.value = shelterRepository.getNextShelter(shelterId) != null
+            val currentShelter = shelterRepository.getShelterById(shelterId)
+
+            val previousShelter = shelterRepository.getPreviousShelter(shelterId)
+            _hasPreviousShelter.value = previousShelter != null
+
+            // Calculate distance to previous shelter if available
+            if (previousShelter != null && currentShelter != null) {
+                _previousShelterDistance.value = currentShelter.mileage - previousShelter.mileage
+            }
+
+            val nextShelter = shelterRepository.getNextShelter(shelterId)
+            _hasNextShelter.value = nextShelter != null
+
+            // Calculate distance to next shelter if available
+            if (nextShelter != null && currentShelter != null) {
+                _nextShelterDistance.value = nextShelter.mileage - currentShelter.mileage
+            }
         }
     }
 
@@ -77,7 +124,6 @@ class ShelterDetailViewModel @AssistedInject constructor(
                 .flatMapLatest { unit ->
                     getShelterWithWeatherUseCase(shelterId, unit)
                 }
-                .distinctUntilChangedBy { it?.let { Pair(it.dailyWeather.size, it.lastUpdated) } }
                 .catch { exception ->
                     android.util.Log.e("ShelterDetailViewModel", "Error loading shelter", exception)
                     _uiState.value = ShelterDetailUiState.Error(exception.message ?: "Unknown error")
@@ -141,6 +187,33 @@ class ShelterDetailViewModel @AssistedInject constructor(
     suspend fun navigateToNext(): Int? {
         val next = shelterRepository.getNextShelter(shelterId)
         return next?.shelterId
+    }
+
+    /**
+     * Update the temperature unit preference.
+     */
+    fun setTemperatureUnit(unit: TemperatureUnit) {
+        viewModelScope.launch {
+            userPreferencesRepository.setTemperatureUnit(unit)
+        }
+    }
+
+    /**
+     * Update the distance unit preference.
+     */
+    fun setDistanceUnit(unit: DistanceUnit) {
+        viewModelScope.launch {
+            userPreferencesRepository.setDistanceUnit(unit)
+        }
+    }
+
+    /**
+     * Update the theme mode preference.
+     */
+    fun setThemeMode(mode: ThemeMode, context: android.content.Context) {
+        viewModelScope.launch {
+            userPreferencesRepository.setThemeMode(mode, context)
+        }
     }
 }
 

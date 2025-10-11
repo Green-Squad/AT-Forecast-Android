@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.gsnamespace.atforecast.domain.model.DistanceUnit
 import com.gsnamespace.atforecast.domain.model.TemperatureUnit
 import com.gsnamespace.atforecast.domain.model.ThemeMode
 
@@ -28,8 +29,10 @@ import com.gsnamespace.atforecast.domain.model.ThemeMode
 @Composable
 fun SettingsDialog(
     currentTemperatureUnit: TemperatureUnit,
+    currentDistanceUnit: DistanceUnit,
     currentThemeMode: ThemeMode,
     onTemperatureUnitChange: (TemperatureUnit) -> Unit,
+    onDistanceUnitChange: (DistanceUnit) -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -69,6 +72,41 @@ fun SettingsDialog(
                             text = when (unit) {
                                 TemperatureUnit.FAHRENHEIT -> "Fahrenheit (°F)"
                                 TemperatureUnit.CELSIUS -> "Celsius (°C)"
+                            },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Distance Unit Section
+                Text(
+                    text = "Distance Unit",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                DistanceUnit.entries.forEach { unit ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onDistanceUnitChange(unit) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = unit == currentDistanceUnit,
+                            onClick = { onDistanceUnitChange(unit) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = when (unit) {
+                                DistanceUnit.IMPERIAL -> "Imperial (mi, mph)"
+                                DistanceUnit.METRIC -> "Metric (km, km/h)"
                             },
                             style = MaterialTheme.typography.bodyLarge
                         )
