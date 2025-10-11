@@ -394,12 +394,18 @@ private fun HourlyWeatherRow(hourlyWeather: HourlyWeather) {
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1f)
         )
-        Text(
-            text = hourlyWeather.description,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
-        )
+        Column(modifier = Modifier.weight(1.5f)) {
+            Text(
+                text = hourlyWeather.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = hourlyWeather.wind,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
         Text(
             text = "${hourlyWeather.temp}°",
             style = MaterialTheme.typography.bodySmall,
