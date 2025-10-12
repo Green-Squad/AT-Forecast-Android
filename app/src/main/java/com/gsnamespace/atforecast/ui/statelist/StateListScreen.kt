@@ -110,8 +110,12 @@ fun StateListScreen(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
                                 placeholder = {
+                                    val placeholderRes = when (currentDistanceUnit) {
+                                        com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> R.string.search_placeholder_miles
+                                        com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> R.string.search_placeholder_kilometers
+                                    }
                                     Text(
-                                        text = androidx.compose.ui.res.stringResource(R.string.search_placeholder),
+                                        text = androidx.compose.ui.res.stringResource(placeholderRes),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
                                     )
                                 },
@@ -122,8 +126,13 @@ fun StateListScreen(
                                 ),
                                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(
                                     onSearch = {
-                                        val mileage = searchQuery.toDoubleOrNull()
-                                        if (mileage != null) {
+                                        val inputValue = searchQuery.toDoubleOrNull()
+                                        if (inputValue != null) {
+                                            // Convert km to miles if in metric mode
+                                            val mileage = when (currentDistanceUnit) {
+                                                com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> inputValue
+                                                com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> inputValue / 1.60934
+                                            }
                                             coroutineScope.launch {
                                                 val shelterId = viewModel.searchByMileage(mileage)
                                                 if (shelterId != null) {
@@ -132,7 +141,11 @@ fun StateListScreen(
                                                     showSearchField = false
                                                     searchQuery = ""
                                                 } else {
-                                                    Toast.makeText(context, "No shelter found at mile $mileage", Toast.LENGTH_SHORT).show()
+                                                    val unit = when (currentDistanceUnit) {
+                                                        com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> "mile"
+                                                        com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> "kilometer"
+                                                    }
+                                                    Toast.makeText(context, "No shelter found at $unit $inputValue", Toast.LENGTH_SHORT).show()
                                                 }
                                             }
                                         }

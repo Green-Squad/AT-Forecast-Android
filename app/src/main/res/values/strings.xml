@@ -2,7 +2,8 @@
     <string name="app_name">ATForecast</string>
 
     <!-- Search -->
-    <string name="search_placeholder">Enter mile marker…</string>
+    <string name="search_placeholder_miles">Enter mile marker…</string>
+    <string name="search_placeholder_kilometers">Enter kilometer marker…</string>
     <string name="search_description">Search by mileage</string>
     <string name="close_search_description">Close search</string>
 

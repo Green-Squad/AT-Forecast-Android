@@ -50,6 +50,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Terrain
+import androidx.compose.material.icons.filled.WbTwilight
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gsnamespace.atforecast.domain.model.DailyWeather
@@ -335,16 +339,52 @@ private fun ShelterInfoCard(
                 Column(modifier = Modifier.weight(1f)) {
                     val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(shelter.mileage, distanceUnit)
                     val distanceLabel = when (distanceUnit) {
-                        com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> "Mile"
-                        com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> "Kilometer"
+                        com.gsnamespace.atforecast.domain.model.DistanceUnit.IMPERIAL -> "NOBO Mile"
+                        com.gsnamespace.atforecast.domain.model.DistanceUnit.METRIC -> "NOBO Kilometer"
                     }
-                    InfoRow(label = distanceLabel, value = distanceValue)
+                    InfoRow(
+                        label = distanceLabel,
+                        value = distanceValue,
+                        icon = androidx.compose.material.icons.Icons.Default.Place
+                    )
                 }
                 shelter.elevation?.let { elevation ->
                     Column(modifier = Modifier.weight(1f)) {
                         val elevationValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatElevation(elevation, distanceUnit)
                         val elevationLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getElevationUnitLabel(distanceUnit)
-                        InfoRow(label = "Elevation", value = "$elevationValue $elevationLabel")
+                        InfoRow(
+                            label = "Elevation",
+                            value = "$elevationValue $elevationLabel",
+                            icon = androidx.compose.material.icons.Icons.Default.Terrain
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Sunrise and sunset times
+            val (sunrise, sunset) = com.gsnamespace.atforecast.domain.util.SunTimesCalculator.calculateSunTimes(
+                shelter.latitude,
+                shelter.longitude
+            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                sunrise?.let {
+                    Column(modifier = Modifier.weight(1f)) {
+                        InfoRow(
+                            label = "Sunrise",
+                            value = it,
+                            icon = androidx.compose.material.icons.Icons.Default.WbTwilight
+                        )
+                    }
+                }
+                sunset?.let {
+                    Column(modifier = Modifier.weight(1f)) {
+                        InfoRow(
+                            label = "Sunset",
+                            value = it,
+                            icon = androidx.compose.material.icons.Icons.Default.NightsStay
+                        )
                     }
                 }
             }
@@ -361,7 +401,9 @@ private fun ShelterInfoCard(
                 Text(
                     text = "Last updated $relativeTime",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
             }
         }
@@ -369,18 +411,31 @@ private fun ShelterInfoCard(
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
-    Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+private fun InfoRow(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            modifier = Modifier.size(24.dp),
+            tint = MaterialTheme.colorScheme.primary
         )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 
@@ -554,7 +609,7 @@ private fun NavigationButtons(
                     Spacer(modifier = Modifier.width(8.dp))
                     if (previousDistance != null) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("SOBO")
+                            Text("Previous")
                             val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(previousDistance, distanceUnit)
                             val distanceLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getDistanceUnitLabel(distanceUnit)
                             Text("$distanceValue $distanceLabel")
@@ -573,7 +628,7 @@ private fun NavigationButtons(
                 ) {
                     if (nextDistance != null) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("NOBO")
+                            Text("Next")
                             val distanceValue = com.gsnamespace.atforecast.domain.util.UnitConverter.formatDistance(nextDistance, distanceUnit)
                             val distanceLabel = com.gsnamespace.atforecast.domain.util.UnitConverter.getDistanceUnitLabel(distanceUnit)
                             Text("$distanceValue $distanceLabel")
