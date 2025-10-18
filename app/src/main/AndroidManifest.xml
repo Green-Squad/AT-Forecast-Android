@@ -41,12 +41,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:scheme="https"
-                    android:host="www.atforecast.app" />
-                <data
-                    android:scheme="https"
-                    android:host="atforecast.app" />
+                <data android:scheme="https" />
+                <data android:host="www.atforecast.app" />
+                <data android:host="atforecast.app" />
             </intent-filter>
         </activity>
     </application>

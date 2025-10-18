@@ -45,7 +45,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gsnamespace.atforecast.domain.model.State
 import com.gsnamespace.atforecast.ui.components.DistanceUnitDialog
-import com.gsnamespace.atforecast.ui.components.MileageSearchDialog
 import com.gsnamespace.atforecast.ui.components.RequestLocationPermission
 import com.gsnamespace.atforecast.ui.components.StateImage
 import com.gsnamespace.atforecast.ui.components.TemperatureUnitDialog
@@ -187,7 +186,7 @@ fun StateListScreen(
                             searchQuery = ""
                         }) {
                             Icon(
-                                imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Close search"
                             )
                         }
