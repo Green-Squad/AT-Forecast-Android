@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -133,13 +132,16 @@ class ShelterDetailViewModel @AssistedInject constructor(
                         android.util.Log.d("ShelterDetailViewModel", "Loaded shelter with ${shelterWithWeather.dailyWeather.size} daily forecasts")
                         _uiState.value = ShelterDetailUiState.Success(shelterWithWeather)
 
-                        // If no weather data, trigger a refresh (only once, and not during manual refresh)
-                        if (shelterWithWeather.dailyWeather.isEmpty() &&
-                            !hasTriggeredAutoRefresh &&
-                            !_isRefreshing.value) {
-                            android.util.Log.d("ShelterDetailViewModel", "No weather data, triggering refresh")
-                            hasTriggeredAutoRefresh = true
-                            refreshWeather()
+                        // Trigger refresh if weather data is missing or stale (only once per screen visit)
+                        if (!hasTriggeredAutoRefresh && !_isRefreshing.value) {
+                            val shouldAutoRefresh = shelterWithWeather.dailyWeather.isEmpty() ||
+                                isWeatherStale(shelterWithWeather.lastUpdated)
+
+                            if (shouldAutoRefresh) {
+                                android.util.Log.d("ShelterDetailViewModel", "Weather is stale or missing, triggering auto-refresh")
+                                hasTriggeredAutoRefresh = true
+                                refreshWeather()
+                            }
                         }
                     } else {
                         _uiState.value = ShelterDetailUiState.Error("Shelter not found")
@@ -214,6 +216,19 @@ class ShelterDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userPreferencesRepository.setThemeMode(mode, context)
         }
+    }
+
+    /**
+     * Check if weather data is stale (older than 2 hours).
+     */
+    private fun isWeatherStale(lastUpdated: Long): Boolean {
+        if (lastUpdated == 0L) return true // Never updated
+
+        val currentTime = System.currentTimeMillis()
+        val timeSinceUpdate = currentTime - lastUpdated
+        val twoHoursInMillis = 2 * 60 * 60 * 1000L
+
+        return timeSinceUpdate > twoHoursInMillis
     }
 }
 
