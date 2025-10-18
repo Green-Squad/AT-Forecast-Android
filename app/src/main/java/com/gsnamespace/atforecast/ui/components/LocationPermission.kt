@@ -31,8 +31,11 @@ fun RequestLocationPermission(
     var permissionRequested by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        // Grant access if either fine or coarse location is granted
+        val isGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                       permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         if (isGranted) {
             onPermissionGranted()
         } else {
@@ -44,20 +47,31 @@ fun RequestLocationPermission(
         if (!permissionRequested) {
             permissionRequested = true
             when {
+                // Check if either permission is already granted
                 ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     onPermissionGranted()
                 }
                 ActivityCompat.shouldShowRequestPermissionRationale(
                     context as Activity,
                     Manifest.permission.ACCESS_FINE_LOCATION
+                ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as Activity,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 ) -> {
                     showRationaleDialog = true
                 }
                 else -> {
-                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    permissionLauncher.launch(arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ))
                 }
             }
         }
@@ -77,7 +91,10 @@ fun RequestLocationPermission(
                 TextButton(
                     onClick = {
                         showRationaleDialog = false
-                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        permissionLauncher.launch(arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ))
                     }
                 ) {
                     Text("Grant Permission")
