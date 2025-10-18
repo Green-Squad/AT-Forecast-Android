@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="nearest_shelter"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_location"
+        android:shortcutShortLabel="@string/shortcut_nearest_shelter_short"
+        android:shortcutLongLabel="@string/shortcut_nearest_shelter_long"
+        android:shortcutDisabledMessage="@string/shortcut_nearest_shelter_disabled">
+        <intent
+            android:action="com.gsnamespace.atforecast.ACTION_NEAREST_SHELTER"
+            android:targetPackage="com.gsnamespace.atforecast"
+            android:targetClass="com.gsnamespace.atforecast.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

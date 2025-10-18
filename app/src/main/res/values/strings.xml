@@ -26,4 +26,9 @@
 
     <!-- Messages -->
     <string name="no_shelter_found_at_mile">No shelter found at mile %1$s</string>
+
+    <!-- App Shortcuts -->
+    <string name="shortcut_nearest_shelter_short">Nearest Shelter</string>
+    <string name="shortcut_nearest_shelter_long">Find Nearest Shelter</string>
+    <string name="shortcut_nearest_shelter_disabled">Location permission required</string>
 </resources>

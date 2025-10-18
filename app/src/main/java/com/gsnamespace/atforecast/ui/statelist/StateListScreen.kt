@@ -64,6 +64,7 @@ import com.gsnamespace.atforecast.R
 fun StateListScreen(
     onNavigateToShelters: (Int?, String, String?) -> Unit,
     onNavigateToShelter: (Int) -> Unit,
+    triggerNearestShelter: Boolean = false,
     viewModel: StateListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -79,8 +80,17 @@ fun StateListScreen(
     var showSearchField by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var requestLocationPermission by remember { mutableStateOf(false) }
+    var hasTriggeredShortcut by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    // Trigger nearest shelter search once on initial composition if requested
+    androidx.compose.runtime.LaunchedEffect(triggerNearestShelter) {
+        if (triggerNearestShelter && !hasTriggeredShortcut) {
+            hasTriggeredShortcut = true
+            requestLocationPermission = true
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

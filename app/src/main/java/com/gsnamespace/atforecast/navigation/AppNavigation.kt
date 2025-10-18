@@ -47,9 +47,13 @@ data class ShelterDetailRoute(
  * Implements Navigation 3 with type-safe routes and ViewModel scoping.
  *
  * @param initialShelterId Optional shelter ID from deep link to navigate directly to shelter detail
+ * @param triggerNearestShelter If true, automatically trigger "find nearest shelter" flow on home screen
  */
 @Composable
-fun AppNavigation(initialShelterId: Int? = null) {
+fun AppNavigation(
+    initialShelterId: Int? = null,
+    triggerNearestShelter: Boolean = false
+) {
     val initialRoute: NavKey = if (initialShelterId != null) {
         ShelterDetailRoute(initialShelterId)
     } else {
@@ -57,6 +61,9 @@ fun AppNavigation(initialShelterId: Int? = null) {
     }
 
     val backStack = rememberNavBackStack(initialRoute)
+
+    // Track if we've already triggered the nearest shelter search
+    val hasTriggeredNearestShelter = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     NavDisplay(
         entryDecorators = listOf(
@@ -71,13 +78,20 @@ fun AppNavigation(initialShelterId: Int? = null) {
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<StateListRoute> {
+                // Only trigger on first show, not when navigating back
+                val shouldTrigger = triggerNearestShelter && !hasTriggeredNearestShelter.value
+                if (shouldTrigger) {
+                    hasTriggeredNearestShelter.value = true
+                }
+
                 com.gsnamespace.atforecast.ui.statelist.StateListScreen(
                     onNavigateToShelters = { stateId, stateName, shelterIds ->
                         backStack.add(ShelterListRoute(stateId, stateName, shelterIds))
                     },
                     onNavigateToShelter = { shelterId ->
                         backStack.add(ShelterDetailRoute(shelterId))
-                    }
+                    },
+                    triggerNearestShelter = shouldTrigger
                 )
             }
 

@@ -21,12 +21,19 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userPreferencesRepository: UserPreferencesRepository
 
+    companion object {
+        const val ACTION_NEAREST_SHELTER = "com.gsnamespace.atforecast.ACTION_NEAREST_SHELTER"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         // Extract deep link shelter ID if present
         val deepLinkShelterId = extractDeepLinkShelterId(intent)
+
+        // Check if this is a "nearest shelter" shortcut action
+        val isNearestShelterShortcut = intent.action == ACTION_NEAREST_SHELTER
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(
@@ -41,7 +48,10 @@ class MainActivity : ComponentActivity() {
             }
 
             ATForecastTheme(darkTheme = useDarkTheme) {
-                AppNavigation(initialShelterId = deepLinkShelterId)
+                AppNavigation(
+                    initialShelterId = deepLinkShelterId,
+                    triggerNearestShelter = isNearestShelterShortcut
+                )
             }
         }
     }
