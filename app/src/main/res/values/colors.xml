@@ -10,4 +10,5 @@
 
     <!-- Splash screen backgrounds -->
     <color name="splash_background_light">#F5F5F5</color>
+    <color name="splash_background_dark">#121212</color>
 </resources>
