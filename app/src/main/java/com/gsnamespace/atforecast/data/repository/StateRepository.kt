@@ -97,8 +97,25 @@ class StateRepository @Inject constructor(
      * @param maxAgeHours Maximum age in hours before data is considered stale
      */
     suspend fun isStale(maxAgeHours: Int = 24): Boolean {
-        val states = stateDao.getAllStates()
-        // This is a simplified check - in production, track last update time
-        return false // Implement based on timestamp checking
+        val states = stateDao.getAllStatesOnce()
+
+        // If no states exist, consider stale (needs initial fetch)
+        if (states.isEmpty()) {
+            return true
+        }
+
+        // Check if oldest state is stale based on updatedAt timestamp
+        val currentTime = System.currentTimeMillis()
+        val maxAgeMillis = maxAgeHours * 60 * 60 * 1000L
+
+        // Find the oldest state by updatedAt
+        val oldestState = states.minByOrNull { it.updatedAt }
+
+        return if (oldestState != null) {
+            val age = currentTime - oldestState.updatedAt
+            age > maxAgeMillis
+        } else {
+            true
+        }
     }
 }

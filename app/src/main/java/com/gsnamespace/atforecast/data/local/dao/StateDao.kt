@@ -17,6 +17,9 @@ interface StateDao {
     @Query("SELECT * FROM states ORDER BY name ASC")
     fun getAllStates(): Flow<List<StateEntity>>
 
+    @Query("SELECT * FROM states ORDER BY name ASC")
+    suspend fun getAllStatesOnce(): List<StateEntity>
+
     @Query("SELECT * FROM states WHERE stateId = :stateId")
     suspend fun getStateById(stateId: Int): StateEntity?
 

@@ -92,9 +92,16 @@ class StateListViewModel @Inject constructor(
                         // No cached data, trigger refresh
                         refreshStates()
                     } else {
+                        // Show cached data immediately (offline-first)
                         _uiState.value = StateListUiState.Success(
                             states = states.toDomainStates(unit)
                         )
+
+                        // Check if data is stale and refresh in background if needed
+                        if (stateRepository.isStale(maxAgeHours = 24)) {
+                            android.util.Log.d("StateListViewModel", "States are stale (>24h old), refreshing in background")
+                            refreshStates()
+                        }
                     }
                 }
         }
