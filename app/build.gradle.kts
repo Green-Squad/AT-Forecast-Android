@@ -26,7 +26,7 @@ android {
         applicationId = "com.gsnamespace.atforecast"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -64,6 +64,14 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Hilt/Dagger reads Kotlin metadata via kotlin-metadata-jvm; force a version that
+// understands Kotlin 2.4.0 metadata (Dagger's bundled default caps at 2.3.0).
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.0")
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -82,7 +90,6 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Navigation Compose
-    implementation(libs.androidx.material3.navigation3)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)

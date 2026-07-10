@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ATForecast is an Android application built using Jetpack Compose with Material 3 expressive features. The project is currently in active development and uses experimental/alpha versions of AndroidX Navigation 3 libraries to leverage the latest navigation patterns.
+ATForecast is an Android application built using Jetpack Compose with Material 3. The project is in active development and uses the stable AndroidX Navigation 3 libraries for type-safe navigation.
 
 **Package name**: `com.gsnamespace.atforecast`
 
 ## Key Technologies
 
-- **Jetpack Compose** with alpha version of Compose BOM for Material 3 expressive features
-- **Navigation 3**: Using the experimental Navigation 3 library (alpha-10) with type-safe navigation via Kotlin serialization
+- **Jetpack Compose** with the stable Compose BOM (Material 3)
+- **Navigation 3**: Using the stable Navigation 3 library (1.1.4) with type-safe navigation via Kotlin serialization
 - **Hilt**: Dependency injection framework
 - **MVVM Architecture**: ViewModels scoped to navigation entries using `rememberViewModelStoreNavEntryDecorator`
 - **Room**: Local database for offline-first data persistence
@@ -46,17 +46,16 @@ ATForecast is an Android application built using Jetpack Compose with Material 3
 
 ### Navigation Setup
 
-The app uses **Navigation 3** (experimental alpha library) with a declarative navigation pattern:
+The app uses **Navigation 3** (stable) with a declarative navigation pattern:
 
 - **Navigation routes** are defined as serializable data objects in `AppNavigation.kt` (e.g., `HomeRoute`, `DetailsRoute`)
 - Navigation is managed via `rememberNavBackStack()` which maintains the back stack
-- `NavDisplay` composable renders the current destination with three critical decorators applied in order:
-  1. `rememberSceneSetupNavEntryDecorator()` - Scene management
-  2. `rememberSavedStateNavEntryDecorator()` - State preservation
-  3. `rememberViewModelStoreNavEntryDecorator()` - ViewModel lifecycle management tied to nav entries
+- `NavDisplay` composable renders the current destination with entry decorators applied in order:
+  1. `rememberSaveableStateHolderNavEntryDecorator()` - State preservation
+  2. `rememberViewModelStoreNavEntryDecorator()` - ViewModel lifecycle management tied to nav entries
 - Screen composables are registered using `entryProvider { entry<Route> { ... } }`
 
-**Important**: The order of decorators in `NavDisplay` matters. ViewModelStore decorator must come after the other decorators to ensure proper ViewModel scoping to navigation entries.
+**Important**: In stable Navigation 3, scene setup is applied automatically by `NavDisplay` (`rememberSceneSetupNavEntryDecorator` is now `internal`), so it is no longer passed explicitly. The order of the remaining decorators still matters — the ViewModelStore decorator must come after the saveable-state decorator to ensure proper ViewModel scoping to navigation entries.
 
 ### Dependency Injection
 
@@ -84,17 +83,16 @@ Main screens:
 
 ## Important Configuration Details
 
-### AndroidX Snapshot Repository
+### Build Toolchain (AGP 9)
 
-The project uses a specific AndroidX snapshot build for experimental Navigation 3 features:
+- **AGP 9.2.0** on **Gradle 9.4.1**, which require **JDK 17+** to run the build (the Android Studio-bundled JBR 21 works).
+- AGP 9 enables built-in Kotlin and the new DSL by default. This project keeps the classic explicit-plugin model (so the Kotlin version stays pinned to 2.4.0) via `android.builtInKotlin=false` and `android.newDsl=false` in `gradle.properties`. **Both flags are removed in AGP 10** — migrate to built-in Kotlin before upgrading to AGP 10.
+- Hilt/Dagger 2.59.2 does not yet understand Kotlin 2.4.0 metadata, so `app/build.gradle.kts` forces `org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.0` on all configurations. Remove this once Dagger officially supports Kotlin 2.4.0.
 
-```kotlin
-maven {
-    url = uri("https://androidx.dev/snapshots/builds/13508953/artifacts/repository")
-}
-```
+### SDK / Library Version Pinning
 
-This is configured in both `pluginManagement` and `dependencyResolutionManagement` sections of `settings.gradle.kts`.
+- Navigation 3 is stable and published to Google Maven, so **no AndroidX snapshot repository is needed**.
+- The project stays on **compileSdk 36** (Android 16, latest stable). In 2026 the newest AndroidX cohort (Compose UI 1.12, lifecycle 2.11, nav3 1.2+, androidx.hilt 1.4, adaptive-navigation3 1.3) moved to requiring compileSdk 37 (Android 17 beta). To remain on API 36, these are pinned to their last API-36 versions: **stable Compose BOM** (ui 1.11.x line), **lifecycle 2.10.0**, **navigation3 1.1.4**, **hilt-navigation-compose 1.3.0**. Bumping any of them past those versions forces compileSdk 37.
 
 ### Compilation Settings
 

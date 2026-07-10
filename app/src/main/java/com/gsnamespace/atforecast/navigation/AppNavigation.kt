@@ -5,8 +5,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 
@@ -67,10 +66,8 @@ fun AppNavigation(
 
     NavDisplay(
         entryDecorators = listOf(
-            // Scene management
-            rememberSceneSetupNavEntryDecorator(),
-            // State preservation
-            rememberSavedStateNavEntryDecorator(),
+            // State preservation (scene setup is applied automatically by NavDisplay)
+            rememberSaveableStateHolderNavEntryDecorator(),
             // ViewModel lifecycle tied to nav entries
             rememberViewModelStoreNavEntryDecorator()
         ),
